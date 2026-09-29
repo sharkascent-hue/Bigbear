@@ -125,6 +125,45 @@ def faq_html(items):
     return "\n".join(f'      <details><summary>{q}<i></i></summary><div class="ans"><p>{a}</p></div></details>' for q, a in items)
 
 
+STEM = [
+    ("S", "Science", "Physics, chemistry, biology &amp; earth science", "#6fc3ff",
+     ["How stars are born, shine and die", "The Sun, Moon, planets and the seasons", "Gravity, light and the colours of the sky", "Life on Earth and the search for life beyond it"]),
+    ("T", "Technology", "The tools that let us explore", "#9b6bff",
+     ["Telescopes, satellites and space probes", "How we photograph galaxies billions of light-years away", "Data, sensors and the technology behind every mission", "The digital dome and how it is projected"]),
+    ("E", "Engineering", "Designing things that work in space", "#e46fb4",
+     ["Rockets, launchers and how they reach orbit", "Space stations and the Moon landings", "Rovers and robots exploring Mars", "How astronauts live, work and stay safe"]),
+    ("M", "Maths", "Numbers, patterns and shapes in the sky", "#ffc861",
+     ["Scale: how big is the Universe, really?", "Distances, light-years and travel times", "Orbits, circles, ellipses and geometry", "Patterns, cycles and counting the stars"]),
+]
+
+
+def stem_section(sec_id=None, tight=False):
+    idattr = f' id="{sec_id}"' if sec_id else ""
+    pad = "padding-top:0;padding-bottom:clamp(40px,6vw,70px)" if tight else "padding-top:0"
+    cards = "\n".join(
+        f'''      <div class="stem rv" style="--c:{c};transition-delay:{i * .08:.2f}s">
+        <span class="letter">{l}</span>
+        <h3>{name}</h3><span class="sub">{sub}</span>
+        <ul>{"".join(f"<li>{b}</li>" for b in bullets)}</ul>
+      </div>''' for i, (l, name, sub, c, bullets) in enumerate(STEM))
+    return f'''<!-- @stem -->
+<section{idattr} class="stem-wrap" style="{pad}">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <span class="eyebrow rv">Our shows</span>
+        <h2 class="rv">All <span class="grad-text">STEM</span> subjects covered</h2>
+      </div>
+      <p class="lead rv" style="max-width:46ch">Space is the doorway to every STEM subject. Our live, interactive shows weave science, technology, engineering and maths together, pitched to the age of the group in front of us.</p>
+    </div>
+    <div class="stem-grid">
+{cards}
+    </div>
+  </div>
+</section>
+<!-- /@stem -->'''
+
+
 # ---------------------------------------------------------------------------
 # Page content
 # ---------------------------------------------------------------------------
@@ -145,14 +184,14 @@ PAGES = [
                ("☔", "Any weather", "Indoors in your hall or gym, the sky inside the dome is always clear.")],
         duo=[("primary", "Primary Schools", "From junior infants to sixth class",
               "Big wonder for small astronomers. Children lie back, look up and explore the night sky together.",
-              ["The Sun, the Moon and the planets of our solar system", "Day and night, and why we have seasons",
-               "Finding constellations and the stories behind them", "Rockets, astronauts and the Moon landings",
+              ["<b>Science:</b> the Sun, Moon, planets, day and night, and the seasons", "<b>Technology:</b> telescopes, satellites and how we look at space",
+               "<b>Engineering:</b> rockets, astronauts and the Moon landings", "<b>Maths:</b> shapes, sizes, patterns and counting the stars",
                "Links with primary science and SESE geography"]),
              ("secondary", "Secondary Schools", "Junior Cycle, TY and Leaving Cert",
               "Deeper journeys for curious minds, from how stars are born to the edge of the observable universe.",
-              ["The life cycle of stars: nebulae, supernovae and black holes", "Galaxies and the true scale of the universe",
-               "Space exploration and the missions happening now", "Supports the Junior Cycle Science Earth and Space strand",
-               "A great fit for Transition Year and Science Week"])],
+              ["<b>Science:</b> the life cycle of stars, from nebulae to black holes", "<b>Technology:</b> how telescopes, probes and data reveal the universe",
+               "<b>Engineering:</b> spacecraft, space stations and missions happening now", "<b>Maths:</b> the scale of the universe, light-years, orbits and gravity",
+               "Supports the Junior Cycle Science Earth and Space strand, and a great fit for Transition Year and Science Week"])],
         videos=[("video/rocket.mp4", "video/rocket.jpg", "Rocket adventure", "0:46", "video/rocket-bg.mp4", "big"),
                 ("video/inside-the-dome.mp4", "video/inside-the-dome.jpg", "Inside the dome", "0:17", "video/inside-the-dome-preview.mp4", "")],
         gallery="schools", gallery_h='Schools we&rsquo;ve <span class="grad-text">visited</span>',
@@ -272,10 +311,6 @@ def page(p):
         duo = f'''
 <section style="padding-top:0">
   <div class="wrap">
-    <div style="text-align:center;margin-bottom:50px">
-      <span class="eyebrow rv">Our shows</span>
-      <h2 class="rv">Pitched for <span class="grad-text">every class</span></h2>
-    </div>
     <div class="duo">
 {cols}
     </div>
@@ -352,6 +387,7 @@ def page(p):
     </div>
   </div>
 </section>
+{stem_section(tight=bool(p.get("duo")))}
 {duo}{phone}
 <!-- ================= VIDEOS ================= -->
 <section id="videos" style="padding-top:0">
@@ -447,6 +483,7 @@ def main():
     ip = os.path.join(ROOT, "index.html")
     s = open(ip).read()
     s = re.sub(r"<!-- @top -->.*?<!-- /@top -->", lambda m: top("index.html"), s, flags=re.S)
+    s = re.sub(r"<!-- @stem -->.*?<!-- /@stem -->", lambda m: stem_section("shows"), s, flags=re.S)
     s = re.sub(r"<!-- @bottom -->.*?<!-- /@bottom -->", lambda m: bottom("index.html"), s, flags=re.S)
     open(ip, "w").write(s)
     print("updated index.html header/footer")
