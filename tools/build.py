@@ -20,6 +20,7 @@ SPEC = '''<script type="speculationrules">{"prerender":[{"where":{"href_matches"
 PHONE, PHONE_TEL = "083 800 1933", "0838001933"
 EMAIL = "info@bigbearplanetariums.ie"
 FACEBOOK = "https://www.facebook.com/bigbearplanetariums/"
+INSTAGRAM = "https://www.instagram.com/bigbearplanetariums/"
 
 # Order here is the order in the nav, menu and footer.
 NAV_PAGES = [
@@ -92,7 +93,7 @@ def bottom(current):
   <div class="wrap">
     <div class="foot">
       <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.png" alt="" width="56" height="61"><span>Big Bear<small>PLANETARIUMS</small></span></a>
-      <nav>{pages}<a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></nav>
+      <nav>{pages}<a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></nav>
     </div>
     <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
   </div>

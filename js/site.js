@@ -4,6 +4,7 @@ const CONTACT = {
   email: "info@bigbearplanetariums.ie",
   website: "www.bigbearplanetariums.ie",
   facebook: "https://www.facebook.com/bigbearplanetariums/",
+  instagram: "https://www.instagram.com/bigbearplanetariums/",
   // Web3Forms access key. Public by design: it can only send enquiries to the inbox it was created for.
   formKey: "47ff878f-e509-42d6-8d65-c19a8d2cd3b7"
 };
@@ -493,6 +494,7 @@ $$('.faq details').forEach(d => {
     mail: '<path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/>',
     phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/>',
     web: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>',
+    ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/>',
     fb: '<path d="M15 3h-2.5A4.5 4.5 0 008 7.5V10H5.5v3.5H8V21h3.5v-7.5H14l.6-3.5h-3.1V7.8c0-.7.5-1.3 1.3-1.3H15z"/>',
     pin: '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'
   };
@@ -502,6 +504,7 @@ $$('.faq details').forEach(d => {
     (CONTACT.phone ? row('phone', 'Call us', CONTACT.phone, 'tel:' + CONTACT.phone.replace(/\s/g, '')) : '') +
     row('mail', 'Email', CONTACT.email, 'mailto:' + CONTACT.email) +
     row('web', 'Website', CONTACT.website, 'https://' + CONTACT.website) +
+    row('ig', 'Instagram', '@bigbearplanetariums', CONTACT.instagram) +
     row('fb', 'Facebook', 'bigbearplanetariums', CONTACT.facebook) +
     row('pin', 'Where', 'Travelling all over Ireland');
 
