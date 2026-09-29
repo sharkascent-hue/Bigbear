@@ -2,7 +2,7 @@
 
 Website for Big Bear Planetariums, a mobile inflatable planetarium in Ireland. *Educate and Inspire.*
 
-A static single page: open `index.html`, or host the folder on any static host (GitHub Pages, Netlify and so on).
+A static site with no build step needed to serve it: open `index.html`, or host the folder on any static host (Vercel, GitHub Pages, Netlify and so on).
 
 - `index.html`: home page (logo intro, hero, audiences, videos, gallery, FAQ, booking)
 - `schools.html`, `corporate-groups.html`, `private-parties.html`, `festivals-events.html`: one page per audience
