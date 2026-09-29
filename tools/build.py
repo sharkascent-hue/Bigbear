@@ -171,7 +171,7 @@ PAGES = [
     dict(
         file="schools.html", type="Primary school",
         title="Primary &amp; Secondary Schools | Big Bear Planetariums",
-        desc="A mobile planetarium for primary and secondary schools in Ireland. Live, curriculum-linked shows inside our inflatable dome, in your own school hall.",
+        desc="A mobile planetarium for primary and secondary schools in Ireland. Live, curriculum-linked shows inside our inflatable planetarium, in your own school hall.",
         bg="rocket-bg", eyebrow="For schools",
         h1='We bring the <span class="grad-text">universe</span> to you.',
         lead="A full planetarium, right in your school hall. Classes take turns stepping inside the dome for a live, interactive show under the stars, and nobody has to leave the building.",
