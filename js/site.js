@@ -3,12 +3,30 @@ const CONTACT = {
   phone: "083 800 1933",
   email: "info@bigbearplanetariums.ie",
   website: "www.bigbearplanetariums.ie",
-  facebook: "https://www.facebook.com/bigbearplanetariums/"
+  facebook: "https://www.facebook.com/bigbearplanetariums/",
+  // Web3Forms access key. Public by design: it can only send enquiries to the inbox it was created for.
+  formKey: "47ff878f-e509-42d6-8d65-c19a8d2cd3b7"
 };
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const yr = $('#yr'); if (yr) yr.textContent = new Date().getFullYear();
+const root = document.documentElement;
+
+/* ============ Hero video: only play while it is on screen, not covered by a menu or player ============ */
+const heroEl = $('#heroVid');
+let heroReady = false, heroVisible = true;
+function heroSync() {
+  if (!heroEl) return;
+  const covered = root.classList.contains('menu-lock') || !!document.querySelector('.lightbox.on');
+  const want = heroReady && heroVisible && !covered && !document.hidden && !document.prerendering;
+  if (want) heroEl.play().catch(() => {}); else heroEl.pause();
+}
+if (heroEl) {
+  new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; heroSync(); }).observe($('#heroMedia') || heroEl);
+  document.addEventListener('visibilitychange', heroSync);
+  document.addEventListener('prerenderingchange', heroSync);
+}
 
 /* ============ Intro: logo video + warp-speed starfield ============ */
 (() => {
@@ -16,20 +34,25 @@ const yr = $('#yr'); if (yr) yr.textContent = new Date().getFullYear();
   if (!intro) {
     document.body.classList.remove('loading');
     requestAnimationFrame(() => document.body.classList.add('ready'));
-    if (hero) hero.play().catch(() => {});
+    const go = () => setTimeout(() => { heroReady = true; if (heroEl) heroEl.preload = 'auto'; heroSync(); }, 250);
+    if (document.readyState === 'complete') go(); else addEventListener('load', go);
     return;
   }
   const c = $('#introStars'), x = c.getContext('2d', {alpha: false});
-  let w, h, stars = [], speed = 3, target = 3, running = true, done = false, last = 0;
+  let w, h, stars = [], speed = 3, target = 3, running = true, done = false, last = 0, frames = 0, acc = 0;
   // Render at CSS-pixel resolution: streaks don't need retina detail and it's 4x cheaper on phones
   const size = () => { w = c.width = innerWidth; h = c.height = innerHeight; };
-  size(); addEventListener('resize', size);
+  size();
+  // Phone browsers resize the page when the address bar hides. Resetting the canvas then makes the stars flash, so ignore small height-only changes.
+  addEventListener('resize', () => { if (innerWidth !== w || Math.abs(innerHeight - h) > 160) size(); });
   const N = Math.round(Math.min(420, Math.max(160, innerWidth * innerHeight / 3000)));
   const spawn = (s, far) => { s.x = (Math.random() - .5) * w * 2; s.y = (Math.random() - .5) * h * 2; s.z = far ? w : Math.random() * w; s.pz = s.z; return s; };
   for (let i = 0; i < N; i++) stars.push(spawn({}));
   const loop = now => {
     if (!running) return;
     const dt = last ? Math.min((now - last) / 16.67, 3) : 1; last = now; // frame-rate independent
+    // Slow phone? After ~20 frames, halve the star count (and flag the page so the background stays light too)
+    if (frames < 40 && last) { frames++; if (frames > 6) acc += dt * 16.67; if (frames === 40) { const avg = acc / 34; if (avg > 30) { stars.length = Math.ceil(stars.length * (avg > 45 ? .4 : .6)); document.documentElement.dataset.perf = 'low'; } } }
     speed += (target - speed) * Math.min(1, .06 * dt);
     x.fillStyle = '#000'; x.fillRect(0, 0, w, h);
     const cx = w / 2, cy = h / 2, k = w * .5;
@@ -54,18 +77,22 @@ const yr = $('#yr'); if (yr) yr.textContent = new Date().getFullYear();
     x.globalAlpha = 1;
     requestAnimationFrame(loop);
   };
+  // The hand-off used to start the hero video, the background starfield, the nebula and all the text animations in the same instant
+  // the intro opened, which froze phones for up to a second. Now each piece starts in its own turn.
   const reveal = () => {
-    document.body.classList.remove('loading');
-    requestAnimationFrame(() => document.body.classList.add('ready'));
-    if (hero) { hero.preload = 'auto'; hero.play().catch(() => {}); }
+    document.body.classList.add('ready');                                    // hero text: compositor-only, cheap
+    setTimeout(() => document.body.classList.remove('loading'), 450);        // background fades in after the overlay is gone
+    setTimeout(() => { heroReady = true; if (heroEl) heroEl.preload = 'auto'; heroSync(); }, 900); // video decode last; poster shows meanwhile
+    if (window.__fixHash) setTimeout(window.__fixHash, 500);                    // a link like /#videos: re-aim now that the page is unlocked
   };
   const finish = instant => {
     if (done) return; done = true;
     try { sessionStorage.setItem('bb-intro', '1'); } catch (e) {}
-    if (instant) { intro.classList.add('gone'); running = false; reveal(); return; }
+    if (instant) { intro.classList.add('gone'); running = false; document.body.classList.remove('loading'); reveal(); return; }
     target = 90; intro.classList.add('warp');
-    setTimeout(() => { intro.classList.add('open'); reveal(); }, 650);
-    setTimeout(() => { intro.classList.add('gone'); running = false; vid.pause(); }, 1600);
+    setTimeout(() => { intro.classList.add('open'); requestAnimationFrame(() => setTimeout(reveal, 120)); }, 650);
+    intro.addEventListener('transitionend', function te(e) { if (e.target !== intro || e.propertyName !== 'opacity') return; intro.removeEventListener('transitionend', te); intro.classList.add('gone'); running = false; vid.pause(); });
+    setTimeout(() => { if (!intro.classList.contains('gone')) { intro.classList.add('gone'); running = false; vid.pause(); } }, 1700); // safety net if transitionend never fires
   };
   $('#skip').onclick = () => finish();
 
@@ -105,18 +132,22 @@ const yr = $('#yr'); if (yr) yr.textContent = new Date().getFullYear();
 (() => {
   const c = $('#stars'), x = c.getContext('2d');
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  let w, h, dpr, stars = [], shoot = [], trail = [], mx = 0, my = 0, px0 = -1, py0 = -1, sy = 0, nextShot = 60;
+  let w, h, dpr, stars = [], shoot = [], trail = [], mx = 0, my = 0, px0 = -1, py0 = -1, sy = 0, nextShot = 60, cx = 0, cy = 0, trimmed = false, lastT = 0, drawn = false;
   const resize = () => {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr;
-    const n = Math.min(420, Math.floor(innerWidth * innerHeight / 3200));
+    // Phones get a 1x canvas: the dots are tiny, and a 3x canvas is 9x the pixels to clear and repaint every frame
+    dpr = fine ? Math.min(devicePixelRatio || 1, 2) : 1;
+    w = c.width = Math.round(innerWidth * dpr); h = c.height = Math.round(innerHeight * dpr);
+    const n = Math.min(420, Math.floor(innerWidth * innerHeight / 3200)) >> (root.dataset.perf === 'low' ? 1 : 0);
     stars = Array.from({length: n}, () => {
-      const z = Math.random() ** 2 * .9 + .1;
+      const z = Math.random() ** 2 * .9 + .1, hue = [220, 220, 220, 45, 265, 190][Math.floor(Math.random() * 6)];
       return {x: Math.random() * w, y: Math.random() * h, z, r: (z * 1.5 + .25) * dpr, t: Math.random() * 6.28, sp: .01 + Math.random() * .03,
-        hue: [220, 220, 220, 45, 265, 190][Math.floor(Math.random() * 6)], glint: z > .85 && Math.random() < .5};
+        fill: `hsl(${hue} 100% 88%)`, line: `hsl(${hue} 100% 92%)`, glint: z > .85 && Math.random() < .5};
     });
   };
-  resize(); addEventListener('resize', resize);
+  resize();
+  let lw = innerWidth, lh = innerHeight;
+  // Phone address bars resize the page while you scroll; rebuilding the stars each time made them jump
+  addEventListener('resize', () => { if (innerWidth !== lw || Math.abs(innerHeight - lh) > 160) { lw = innerWidth; lh = innerHeight; resize(); } });
   addEventListener('mousemove', e => {
     mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5;
     if (fine && !reduce) {
@@ -126,53 +157,63 @@ const yr = $('#yr'); if (yr) yr.textContent = new Date().getFullYear();
     }
   });
   addEventListener('scroll', () => sy = scrollY, {passive: true});
-  let cx = 0, cy = 0;
   const shootingStar = () => {
     const dir = Math.random() < .7 ? 1 : -1, a = .25 + Math.random() * .35, sp = (10 + Math.random() * 8) * dpr;
     shoot.push({x: dir > 0 ? Math.random() * w * .7 : w * (.3 + Math.random() * .7), y: Math.random() * h * .5, l: 0,
       vx: dir * Math.cos(a) * sp, vy: Math.sin(a) * sp, len: (90 + Math.random() * 120) * dpr});
   };
-  const draw = () => {
-    if (document.body.classList.contains('loading')) return requestAnimationFrame(draw); // idle behind the intro
+  const frame = k => {                      // k = elapsed time in 60fps frames, so speed doesn't depend on frame rate
     x.clearRect(0, 0, w, h);
-    cx += (mx - cx) * .05; cy += (my - cy) * .05;
+    cx += (mx - cx) * Math.min(1, .05 * k); cy += (my - cy) * Math.min(1, .05 * k);
+    const big = 1.4 * dpr;
     for (const s of stars) {
-      s.t += s.sp;
+      s.t += s.sp * k;
       const X = ((s.x - cx * 60 * s.z * dpr) % w + w) % w;
       const Y = ((s.y - cy * 60 * s.z * dpr - sy * .25 * s.z * dpr) % h + h) % h;
       const a = (.55 + Math.sin(s.t) * .45) * (.35 + s.z * .65);
-      x.globalAlpha = a; x.fillStyle = `hsl(${s.hue} 100% 88%)`;
-      x.beginPath(); x.arc(X, Y, s.r, 0, 6.283); x.fill();
+      x.globalAlpha = a; x.fillStyle = s.fill;
+      if (s.r < big) x.fillRect(X - s.r, Y - s.r, s.r * 2, s.r * 2);           // tiny stars: a square is far cheaper than an arc
+      else { x.beginPath(); x.arc(X, Y, s.r, 0, 6.283); x.fill(); }
       if (s.glint && a > .6) {
-        x.globalAlpha = (a - .6) * 1.6; x.strokeStyle = `hsl(${s.hue} 100% 92%)`; x.lineWidth = .7 * dpr;
+        x.globalAlpha = (a - .6) * 1.6; x.strokeStyle = s.line; x.lineWidth = .7 * dpr;
         const L = s.r * 5;
         x.beginPath(); x.moveTo(X - L, Y); x.lineTo(X + L, Y); x.moveTo(X, Y - L); x.lineTo(X, Y + L); x.stroke();
       }
     }
-    if (--nextShot <= 0) { shootingStar(); nextShot = 90 + Math.random() * 200; }
+    if ((nextShot -= k) <= 0) { shootingStar(); nextShot = 90 + Math.random() * 200; }
     shoot = shoot.filter(s => s.l < 1);
     for (const s of shoot) {
-      s.l += .012; s.x += s.vx; s.y += s.vy;
+      s.l += .012 * k; s.x += s.vx * k; s.y += s.vy * k;
       const m = Math.hypot(s.vx, s.vy), tx = s.x - s.vx / m * s.len, ty = s.y - s.vy / m * s.len;
       const g = x.createLinearGradient(s.x, s.y, tx, ty);
       g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.3, 'rgba(170,200,255,.5)'); g.addColorStop(1, 'rgba(170,200,255,0)');
-      x.globalAlpha = Math.sin(s.l * Math.PI); x.strokeStyle = g; x.lineWidth = 2 * dpr; x.lineCap = 'round';
+      x.globalAlpha = Math.sin(Math.min(s.l, 1) * Math.PI); x.strokeStyle = g; x.lineWidth = 2 * dpr; x.lineCap = 'round';
       x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(tx, ty); x.stroke();
       x.fillStyle = '#fff'; x.beginPath(); x.arc(s.x, s.y, 1.6 * dpr, 0, 6.283); x.fill();
     }
     trail = trail.filter(p => p.l > 0);
     for (const p of trail) {
-      p.l -= .025; p.x += p.vx; p.y += p.vy;
-      x.globalAlpha = p.l * .8; x.fillStyle = `hsl(${p.hue} 100% 80%)`;
-      x.beginPath(); x.arc(p.x, p.y, p.l * 2.2 * dpr, 0, 6.283); x.fill();
+      p.l -= .025 * k; p.x += p.vx * k; p.y += p.vy * k;
+      x.globalAlpha = Math.max(0, p.l) * .8; x.fillStyle = `hsl(${p.hue} 100% 80%)`;
+      x.beginPath(); x.arc(p.x, p.y, Math.max(0, p.l) * 2.2 * dpr, 0, 6.283); x.fill();
     }
     x.globalAlpha = 1;
-    if (!reduce) requestAnimationFrame(draw);
   };
-  draw();
+  // Idle (no drawing at all) behind the intro, while a menu or player covers the page, during a jump-scroll, or in a hidden tab.
+  const idle = () => document.hidden || document.body.classList.contains('loading') || root.classList.contains('menu-lock') || root.classList.contains('jumping') || !!document.querySelector('.lightbox.on');
+  const loop = now => {
+    requestAnimationFrame(loop);
+    if (idle() || (reduce && drawn)) { lastT = now; return; }
+    const dt = now - lastT;
+    if (dt < 30) return;                                                       // cap at ~30fps: twinkling doesn't need 60
+    lastT = now;
+    if (!trimmed) { trimmed = true; if (root.dataset.perf === 'low') stars.length >>= 1; }
+    frame(Math.min(dt / 16.67, 4)); drawn = true;
+  };
+  requestAnimationFrame(loop);
 })();
 
-/* ============ Gallery ============ */
+
 const PHOTOS = [
   ['school-group', 'schools', 'A school group cheering in front of the navy planetarium'],
   ['dome-lights-hall', 'setup', 'The planetarium glowing under a hall full of star lights'],
@@ -202,6 +243,7 @@ const PHOTOS = [
   ['dome-banners-hall', 'setup', 'The black planetarium framed by our pop-up banners'],
   ['dome-navy-library', 'community', 'The navy planetarium visiting a local library']
 ];
+const SIZES = {"school-group":[700,525],"dome-lights-hall":[700,525],"festival-flags":[700,525],"community-group":[700,525],"dome-black-park":[700,525],"secondary-students":[700,525],"telescope":[700,606],"school-group-2":[700,525],"festival-domes":[700,525],"dome-navy-flags":[700,525],"school-group-4":[700,525],"domes-skydancer-hall":[700,525],"dome-navy-hall":[525,700],"festival-queue":[700,525],"school-group-3":[700,525],"display-plush":[700,525],"dome-black-hall":[700,467],"school-group-5":[700,525],"dome-navy-school":[525,700],"festival-sunny":[525,700],"dome-black-banners":[700,525],"dome-navy-gym":[700,525],"dome-navy-classroom":[700,525],"display-table":[700,467],"dome-navy-hall-2":[700,525],"dome-banners-hall":[700,467],"dome-navy-library":[525,700]};  // photo sizes, so the layout is fixed before images load
 (() => {
   const grid = $('#gallery-grid'); if (!grid) return;
   const moreBtn = $('#moreBtn'), LIMIT = +(grid.dataset.limit || 12), cats = grid.dataset.cats ? grid.dataset.cats.split(',') : null;
@@ -209,7 +251,7 @@ const PHOTOS = [
   const list = PHOTOS.map((p, i) => [...p, i]).filter(p => !cats || cats.includes(p[1]));
   grid.innerHTML = list.map(([f, cat, alt, i], n) =>
     `<figure class="g-item rv${n >= LIMIT ? ' more' : ''}" data-cat="${cat}" data-i="${i}" tabindex="0" style="transition-delay:${(n % 3) * .08}s">
-       <img src="img/${f}-sm.webp" alt="${alt}" loading="lazy">
+       <img src="img/${f}-sm.webp" alt="${alt}" width="${SIZES[f][0]}" height="${SIZES[f][1]}" loading="lazy" decoding="async">
        <figcaption>${alt}</figcaption>
      </figure>`).join('');
   $$('.filters button').forEach(b => b.onclick = () => {
@@ -275,20 +317,89 @@ const PHOTOS = [
 })();
 
 /* ============ Header, progress, parallax, to-top ============ */
-const menuOpen = () => document.documentElement.classList.contains('menu-lock');
+const menuOpen = () => root.classList.contains('menu-lock');
+let closeMenu = () => {};
+
+/* ============ Jump links: one fast, predictable scroll ============
+   The old browser smooth-scroll took seconds on this long page and stopped early, because photos above the target
+   kept loading and growing the page. This scrolls for a fixed short time, re-aims at the target every frame, and
+   keeps checking for a moment afterwards. */
+const jump = (() => {
+  let raf = 0, token = 0;
+  const stop = () => { token++; cancelAnimationFrame(raf); raf = 0; root.classList.remove('jumping'); };
+  addEventListener('wheel', stop, {passive: true});
+  addEventListener('touchstart', stop, {passive: true});
+  const dest = t => {
+    const m = parseFloat(getComputedStyle(t).scrollMarginTop) || 0, max = root.scrollHeight - innerHeight;
+    return Math.max(0, Math.min(t.getBoundingClientRect().top + scrollY - m, max));
+  };
+  const settle = (getDest, my) => {
+    let n = 0;
+    const chk = () => { if (my !== token) return; const d = getDest(); if (Math.abs(d - scrollY) > 2) scrollTo(0, d); if (++n < 10) setTimeout(chk, 130); };
+    setTimeout(chk, 60);
+  };
+  const to = getDest => {
+    stop();
+    const my = token, y0 = scrollY, dist = Math.abs(getDest() - y0);
+    if (dist < 2) return;
+    const dur = reduce ? 0 : Math.min(650, 240 + dist * .05), t0 = performance.now();
+    root.classList.add('jumping');
+    const step = now => {
+      if (my !== token) return;
+      const k = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - k, 3);
+      scrollTo(0, y0 + (getDest() - y0) * e);
+      if (k < 1) raf = requestAnimationFrame(step);
+      else { raf = 0; root.classList.remove('jumping'); settle(getDest, my); }
+    };
+    raf = requestAnimationFrame(step);
+  };
+  return {to, dest};
+})();
+
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href]');
+  if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank' || a.hasAttribute('download')) return;
+  let u; try { u = new URL(a.href, location.href); } catch (_) { return; }
+  if (u.origin !== location.origin) return;
+  const norm = p => p.replace(/index\.html$/, '').replace(/\/$/, '');
+  if (norm(u.pathname) !== norm(location.pathname)) {          // another page: show that something is happening straight away
+    root.classList.add('navigating');
+    return;
+  }
+  const t = u.hash.length > 1 ? document.getElementById(decodeURIComponent(u.hash.slice(1))) : null;
+  if (u.hash.length > 1 && !t) return;
+  e.preventDefault();
+  const go = () => jump.to(t ? () => jump.dest(t) : () => 0);
+  try { history.replaceState(null, '', u.hash || location.pathname); } catch (_) {}
+  if (menuOpen()) { closeMenu(); requestAnimationFrame(() => requestAnimationFrame(go)); } else go();
+});
+
+// Arriving on a link such as /#videos: the browser jumps once at load, then photos and fonts move things. Re-aim until the visitor scrolls.
+(() => {
+  let touched = false;
+  ['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, () => { touched = true; }, {passive: true, once: true}));
+  const fix = () => {
+    if (touched || location.hash.length < 2 || document.body.classList.contains('loading')) return;
+    const t = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (t && Math.abs(jump.dest(t) - scrollY) > 4) scrollTo(0, jump.dest(t));
+  };
+  window.__fixHash = fix;
+  addEventListener('load', () => { setTimeout(fix, 150); setTimeout(fix, 900); });
+})();
+
 (() => {
   const hd = $('#header'), pr = $('#progress'), tt = $('#toTop'), hero = $('#heroMedia');
   const par = $$('[data-speed]');
   let last = 0, ticking = false;
   const update = () => {
-    const y = scrollY, max = document.documentElement.scrollHeight - innerHeight;
+    const y = scrollY, max = root.scrollHeight - innerHeight;
     hd.classList.toggle('scrolled', y > 40);
     if (!menuOpen()) hd.classList.toggle('hide', y > last && y > 400);
     last = y;
     pr.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
     tt.classList.toggle('on', y > 900);
     if (!reduce) {
-      if (hero && y < innerHeight * 1.2) hero.style.transform = `translateY(${y * .35}px)`;
+      if (hero && y < innerHeight * 1.2) hero.style.transform = `translate3d(0,${y * .35}px,0)`;
       par.forEach(el => {
         const r = el.getBoundingClientRect(), mid = r.top + r.height / 2 - innerHeight / 2;
         el.style.transform = `translateY(${mid * +el.dataset.speed}px)`;
@@ -298,7 +409,7 @@ const menuOpen = () => document.documentElement.classList.contains('menu-lock');
   };
   addEventListener('scroll', () => { if (!ticking && !menuOpen()) { requestAnimationFrame(update); ticking = true; } }, {passive: true});
   update();
-  tt.onclick = () => scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'});
+  tt.onclick = () => jump.to(() => 0);
 })();
 
 /* ============ Mobile menu ============ */
@@ -307,30 +418,21 @@ const menuOpen = () => document.documentElement.classList.contains('menu-lock');
   const toggle = on => {
     mnav.classList.toggle('on', on); bg.classList.toggle('on', on);
     hd.classList.toggle('menu-open', on); if (on) hd.classList.remove('hide');
-    document.documentElement.classList.toggle('menu-lock', on);
+    root.classList.toggle('menu-lock', on);
     bg.setAttribute('aria-expanded', on); bg.setAttribute('aria-label', on ? 'Close menu' : 'Open menu');
     if (on) mnav.scrollTop = 0;
+    heroSync();
   };
+  closeMenu = () => toggle(false);
   bg.addEventListener('click', () => toggle(!menuOpen()));
-  mnav.addEventListener('click', e => {
-    const a = e.target.closest('a'); if (!a) return;
-    const url = new URL(a.href, location.href);
-    const samePage = url.pathname.replace(/index\.html$/, '') === location.pathname.replace(/index\.html$/, '') && url.hash;
-    toggle(false);
-    if (samePage) {
-      // Scroll ourselves once the page is unlocked: iOS ignores anchor jumps while scrolling is locked
-      e.preventDefault();
-      const t = document.querySelector(url.hash);
-      if (t) requestAnimationFrame(() => requestAnimationFrame(() => t.scrollIntoView({behavior: reduce ? 'auto' : 'smooth'})));
-      history.replaceState(null, '', url.hash);
-    }
-  });
+  // Links inside the menu are handled by the page-wide link handler above (it closes the menu, then scrolls)
   addEventListener('keydown', e => { if (e.key === 'Escape' && menuOpen()) toggle(false); });
   addEventListener('resize', () => { if (innerWidth > 820 && menuOpen()) toggle(false); });
-  addEventListener('pageshow', () => toggle(false)); // back/forward cache: never come back with the menu open
+  addEventListener('pageshow', () => { toggle(false); root.classList.remove('navigating'); }); // back button: never return to an open menu
 })();
 
 /* ============ Pointer effects: cursor glow, tilt, magnetic ============ */
+
 if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
   const cur = $('#cursor'); let cx = 0, cy = 0, tx = 0, ty = 0;
   addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; cur.style.opacity = 1; });
@@ -353,8 +455,8 @@ if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
 /* ============ Video modal + hover previews ============ */
 (() => {
   const box = $('#vidbox'), v = $('#promo');
-  const open = (src, poster) => { v.poster = poster || ''; v.src = src; box.classList.add('on'); document.body.style.overflow = 'hidden'; v.play().catch(() => {}); };
-  const close = () => { box.classList.remove('on'); v.pause(); v.removeAttribute('src'); v.load(); document.body.style.overflow = ''; };
+  const open = (src, poster) => { v.poster = poster || ''; v.src = src; box.classList.add('on'); document.body.style.overflow = 'hidden'; heroSync(); v.play().catch(() => {}); };
+  const close = () => { box.classList.remove('on'); v.pause(); v.removeAttribute('src'); v.load(); document.body.style.overflow = ''; heroSync(); };
   $$('[data-play]').forEach(b => b.addEventListener('click', () => open(b.dataset.play, b.dataset.poster)));
   $$('.vid-card').forEach(c => {
     c.onclick = () => open(c.dataset.src, c.dataset.poster);
@@ -408,14 +510,53 @@ $$('.faq details').forEach(d => {
   const d = $('#f-date'); d.min = new Date().toISOString().split('T')[0];
   if (form.dataset.type) form.type.value = form.dataset.type;
 
-  form.addEventListener('submit', e => {
+  const ok = $('#formOk');
+  const say = (msg, good) => { ok.textContent = msg; ok.classList.toggle('bad', !good); ok.classList.add('on'); ok.scrollIntoView({block: 'nearest'}); };
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const f = e.target, name = f.name.value.trim(), email = f.email.value.trim();
     let bad = false;
     [[f.name, !name], [f.email, !/^\S+@\S+\.\S+$/.test(email)]].forEach(([el, b]) => { el.style.borderColor = b ? '#ff7a9a' : ''; if (b) bad = true; });
-    if (bad) return;
-    const body = `Name: ${name}\nEmail: ${email}\nPhone: ${f.phone.value}\nBooking for: ${f.type.value}\nPreferred date: ${f.date.value}\nCounty: ${f.county.value}\n\n${f.message.value}`;
-    location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent('Planetarium booking enquiry: ' + f.type.value)}&body=${encodeURIComponent(body)}`;
-    $('#formOk').classList.add('on');
+    if (bad) { say('Please add your name and a valid email so we can reply.', false); return; }
+    if (f.botcheck && f.botcheck.checked) return;                               // hidden trap field: only spam bots tick it
+    const btn = f.querySelector('button[type=submit]'), label = btn.innerHTML;
+    btn.disabled = true; btn.textContent = 'Sending…'; ok.classList.remove('on');
+    const sendByEmail = () => {
+      const body = `Name: ${name}\nEmail: ${email}\nPhone: ${f.phone.value}\nBooking for: ${f.type.value}\nPreferred date: ${f.date.value}\nCounty: ${f.county.value}\n\n${f.message.value}`;
+      location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent('Planetarium booking enquiry: ' + f.type.value)}&body=${encodeURIComponent(body)}`;
+    };
+    const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 12000);
+    try {
+      const r = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST', headers: {'Content-Type': 'application/json', Accept: 'application/json'}, signal: ctrl.signal,
+        body: JSON.stringify({
+          access_key: CONTACT.formKey, subject: `Planetarium enquiry: ${f.type.value} (${name})`, from_name: 'Big Bear Planetariums website',
+          name, email, phone: f.phone.value, booking_for: f.type.value, preferred_date: f.date.value, county: f.county.value,
+          message: f.message.value, page: location.href, botcheck: ''
+        })
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.success) throw new Error(j.message || r.status);
+      say(`Thanks ${name.split(' ')[0]}! Your enquiry has been sent and we'll be in touch soon. ✨`, true);
+      f.reset(); if (form.dataset.type) f.type.value = form.dataset.type;
+    } catch (err) {
+      say(`We couldn't send that just now, so your email app is opening instead. Just press send, or call us on ${CONTACT.phone}.`, false);
+      setTimeout(sendByEmail, 900);
+    } finally {
+      clearTimeout(timer); btn.disabled = false; btn.innerHTML = label;
+    }
   });
+})();
+
+
+/* ============ Warm the other pages ============
+   Quietly download the other pages once this one has settled, so tapping Schools / Corporate / Parties / Festivals is instant. */
+(() => {
+  const c = navigator.connection || {};
+  if (c.saveData || /2g/.test(c.effectiveType || '')) return;
+  const here = location.pathname.split('/').pop() || 'index.html';
+  const pages = ['index.html', 'schools.html', 'corporate-groups.html', 'private-parties.html', 'festivals-events.html'].filter(p => p !== here);
+  const warm = () => pages.forEach((p, i) => setTimeout(() => fetch(p, {credentials: 'same-origin', priority: 'low'}).catch(() => {}), i * 400));
+  const later = () => ('requestIdleCallback' in window ? requestIdleCallback(warm, {timeout: 6000}) : setTimeout(warm, 3000));
+  if (document.readyState === 'complete') setTimeout(later, 3500); else addEventListener('load', () => setTimeout(later, 3500));
 })();

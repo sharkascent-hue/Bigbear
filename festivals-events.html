@@ -10,12 +10,16 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Festivals &amp; Events | Big Bear Planetariums">
 <meta property="og:description" content="A mobile planetarium for festivals, fun days, fairs and community events in Ireland. Indoor or outdoor, with shows running all day.">
-<meta property="og:image" content="og-image.jpg">
+<link rel="canonical" href="https://www.bigbearplanetariums.ie/festivals-events.html">
+<meta property="og:url" content="https://www.bigbearplanetariums.ie/festivals-events.html">
+<meta property="og:image" content="https://www.bigbearplanetariums.ie/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/site.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap"></noscript>
+<script type="speculationrules">{"prerender":[{"where":{"href_matches":["/schools.html","/corporate-groups.html","/private-parties.html","/festivals-events.html"]},"eagerness":"moderate"}]}</script>
+<link rel="stylesheet" href="css/site.css?v=7c31eb36">
 </head>
 <body class="loading">
 
@@ -66,7 +70,7 @@
 <!-- ================= HERO ================= -->
 <section class="hero page-hero">
   <div class="hero-video" id="heroMedia">
-    <video id="heroVid" muted loop playsinline autoplay preload="auto" poster="video/festival-bg.jpg">
+    <video id="heroVid" muted loop playsinline preload="metadata" poster="video/festival-bg.jpg">
       <source src="video/festival-bg.mp4" type="video/mp4"><source src="video/festival-bg.webm" type="video/webm">
     </video>
   </div>
@@ -203,6 +207,7 @@
       <div class="contact-info" id="contactInfo"></div>
     </div>
     <form id="bookForm" class="rv r" novalidate data-type="Festival / event">
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" required autocomplete="name"></div>
       <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
       <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
@@ -212,8 +217,8 @@
       <div class="field"><label for="f-county">County</label><select id="f-county" name="county"></select></div>
       <div class="field full"><label for="f-msg">Tell us more</label><textarea id="f-msg" name="message" placeholder="Venue, group size, ages, anything else…"></textarea></div>
       <div class="field full"><button type="submit" class="btn btn-primary magnetic" style="justify-content:center">Send enquiry <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-      <p class="form-note">Sending opens your email app with your details filled in.</p>
-      <div class="form-ok" id="formOk">Thanks! Your email app should now be open. Just press send and we'll be in touch soon. ✨</div>
+      <p class="form-note">Your enquiry goes straight to our inbox, and we'll reply by email or phone.</p>
+      <div class="form-ok" id="formOk" role="status" aria-live="polite"></div>
     </form>
   </div>
 </section>
@@ -258,6 +263,6 @@
 <button class="to-top" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
 <!-- /@bottom -->
 
-<script src="js/site.js"></script>
+<script src="js/site.js?v=570f5b68"></script>
 </body>
 </html>

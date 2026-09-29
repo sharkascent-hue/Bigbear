@@ -5,12 +5,13 @@
   --r:22px;--ease:cubic-bezier(.22,1,.36,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden;touch-action:pan-y pinch-zoom}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden;touch-action:pan-y pinch-zoom}
 body{background:var(--bg);color:var(--text);font-family:Outfit,system-ui,sans-serif;line-height:1.6;overflow-x:hidden;position:relative;width:100%;touch-action:pan-y pinch-zoom}
 main,footer,section,.marquee,.band{overflow-x:clip}
 body.loading{overflow:hidden}
 img,video{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
+a,button,summary,label,select{touch-action:manipulation;-webkit-tap-highlight-color:rgba(111,195,255,.16)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wrap{width:min(1200px,100% - 32px);margin-inline:auto}
 .serif{font-family:Cinzel,serif;letter-spacing:.04em}
@@ -24,18 +25,20 @@ section{position:relative;padding:clamp(80px,12vw,150px) 0;scroll-margin-top:70p
 /* ---------- Starfield canvas (fixed, behind everything) ---------- */
 #stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .nebula{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.nebula i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.28;mix-blend-mode:screen;animation:drift 38s ease-in-out infinite alternate}
-.nebula i:nth-child(1){width:60vmax;height:60vmax;left:-20vmax;top:-10vmax;background:radial-gradient(circle,#5b3bff,transparent 65%)}
-.nebula i:nth-child(2){width:55vmax;height:55vmax;right:-22vmax;top:30vh;background:radial-gradient(circle,#e0489b,transparent 65%);animation-duration:46s;animation-delay:-12s;opacity:.18}
-.nebula i:nth-child(3){width:50vmax;height:50vmax;left:20vw;bottom:-30vmax;background:radial-gradient(circle,#2b8cff,transparent 65%);animation-duration:52s;animation-delay:-25s}
-body.loading .nebula,body.loading #stars{visibility:hidden}
+.nebula i{position:absolute;border-radius:50%;opacity:.3;animation:drift 38s ease-in-out infinite alternate}
+.nebula i:nth-child(1){width:60vmax;height:60vmax;left:-20vmax;top:-10vmax;background:radial-gradient(circle,#5b3bff,rgba(91,59,255,.35) 30%,transparent 68%)}
+.nebula i:nth-child(2){width:55vmax;height:55vmax;right:-22vmax;top:30vh;background:radial-gradient(circle,#e0489b,rgba(224,72,155,.35) 30%,transparent 68%);animation-duration:46s;animation-delay:-12s;opacity:.18}
+.nebula i:nth-child(3){width:50vmax;height:50vmax;left:20vw;bottom:-30vmax;background:radial-gradient(circle,#2b8cff,rgba(43,140,255,.35) 30%,transparent 68%);animation-duration:52s;animation-delay:-25s}
+.nebula,#stars{transition:opacity 1.4s ease}
+body.loading .nebula,body.loading #stars{opacity:0}
+body.loading .nebula i{animation-play-state:paused}
 .nebula i{will-change:transform}
 @keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vw,-4vh) scale(1.15)}100%{transform:translate(-5vw,5vh) scale(.95)}}
 main,footer,header{position:relative;z-index:1}
 
 /* ---------- Intro / start animation ---------- */
-#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#000;overflow:hidden;transition:clip-path .9s cubic-bezier(.65,0,.35,1);clip-path:circle(150% at 50% 50%);contain:strict}
-#intro.open{clip-path:circle(0% at 50% 50%);pointer-events:none}
+#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#000;overflow:hidden;opacity:1;transition:opacity .6s ease;contain:layout paint;touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+#intro.open{opacity:0;pointer-events:none}
 #intro.gone{display:none}
 #introStars{position:absolute;inset:0;width:100%;height:100%}
 .intro-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(60,50,160,.35),transparent 60%);animation:breathe 5s ease-in-out infinite}
@@ -339,7 +342,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
   .cursor{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .rv{opacity:1;transform:none}
 }
 
@@ -450,3 +453,23 @@ a.card:hover .go svg{transform:translateX(5px)}
 .pl.mars{width:12px;height:12px;margin:-6px 0 0 -6px;background:radial-gradient(circle at 30% 30%,#ffb08a,#d8552b 60%,#8a2a10);box-shadow:0 0 10px rgba(255,120,80,.4)}
 .pl.jupiter{width:30px;height:30px;margin:-15px 0 0 -15px;background:linear-gradient(180deg,#e9d3b0 0 18%,#b9834f 18% 34%,#e9d3b0 34% 50%,#a8683a 50% 64%,#e9d3b0 64% 80%,#c99a6a 80%);box-shadow:0 0 18px rgba(230,190,140,.35)}
 @media (max-width:560px){.pl.jupiter{width:24px;height:24px;margin:-12px 0 0 -12px}}
+
+/* ---------- Performance: phones ---------- */
+/* Blurring whatever is behind an element has to be redone every frame while the page moves. Solid colours look the same on this dark design. */
+@media (hover:none) and (pointer:coarse){
+  header.scrolled{background:rgba(7,6,26,.95);-webkit-backdrop-filter:none;backdrop-filter:none}
+  .btn-ghost,.pill,.card .ico,.vid-play,.to-top{-webkit-backdrop-filter:none;backdrop-filter:none}
+  .lightbox{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(4,3,15,.97)}
+  .glare{display:none}
+}
+/* While a menu is open or the page is jumping to a section, stop the endless background animations so the tap feels instant */
+html.menu-lock .nebula i,html.menu-lock .marquee-track,html.menu-lock .solar .orbit,html.menu-lock .solar .sun,html.menu-lock .solar::before,
+html.menu-lock .play::after,html.menu-lock .vid-play::before,html.menu-lock .step .n::after,html.menu-lock .scroll-cue b::after,
+html.jumping .nebula i,html.jumping .marquee-track,html.jumping .solar .orbit,html.jumping .solar .sun,html.jumping .solar::before,
+html.jumping .play::after,html.jumping .vid-play::before,html.jumping .step .n::after{animation-play-state:paused}
+/* Tapped a link to another page: react immediately while it loads */
+html.navigating #progress{transition:transform 1.4s cubic-bezier(.2,.7,.2,1)!important;transform:scaleX(.85)!important}
+html.navigating main{opacity:.55;transition:opacity .35s ease}
+html.navigating .mnav a{pointer-events:none}
+.form-ok.bad{background:rgba(255,122,154,.1);border-color:rgba(255,122,154,.35)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}

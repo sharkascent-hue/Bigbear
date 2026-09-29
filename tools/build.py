@@ -9,11 +9,14 @@ Run from the repo root:  python3 tools/build.py
 - Rewrites the blocks between <!-- @top --> / <!-- /@top --> and
   <!-- @bottom --> / <!-- /@bottom --> in index.html.
 """
+import hashlib
 import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+SITE = "https://www.bigbearplanetariums.ie"
+SPEC = '''<script type="speculationrules">{"prerender":[{"where":{"href_matches":["/schools.html","/corporate-groups.html","/private-parties.html","/festivals-events.html"]},"eagerness":"moderate"}]}</script>'''
 PHONE, PHONE_TEL = "083 800 1933", "0838001933"
 EMAIL = "info@bigbearplanetariums.ie"
 FACEBOOK = "https://www.facebook.com/bigbearplanetariums/"
@@ -273,7 +276,8 @@ PAGES = [
 ]
 
 
-def head(title, desc):
+def head(title, desc, file):
+    url = SITE + "/" + ("" if file == "index.html" else file)
     return f'''<!DOCTYPE html>
 <html lang="en-IE">
 <head>
@@ -286,11 +290,15 @@ def head(title, desc):
 <meta property="og:type" content="website">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
-<meta property="og:image" content="og-image.jpg">
+<link rel="canonical" href="{url}">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{SITE}/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap"></noscript>
+{SPEC}
 <link rel="stylesheet" href="css/site.css">
 </head>'''
 
@@ -341,7 +349,7 @@ def page(p):
         for (of, full, _, _, blurb), img in zip(NAV_PAGES, ["school-group-2", "dome-black-hall", "school-group-4", "festival-queue"])
         if of != f)
     bgsrc = p["bg"]
-    return f'''{head(p["title"], p["desc"])}
+    return f'''{head(p["title"], p["desc"], f)}
 <body class="loading">
 
 {top(f)}
@@ -350,7 +358,7 @@ def page(p):
 <!-- ================= HERO ================= -->
 <section class="hero page-hero">
   <div class="hero-video" id="heroMedia">
-    <video id="heroVid" muted loop playsinline autoplay preload="auto" poster="video/{bgsrc}.jpg">
+    <video id="heroVid" muted loop playsinline preload="metadata" poster="video/{bgsrc}.jpg">
       <source src="video/{bgsrc}.mp4" type="video/mp4"><source src="video/{bgsrc}.webm" type="video/webm">
     </video>
   </div>
@@ -461,6 +469,7 @@ def page(p):
 
 
 FORM = '''<form id="bookForm" class="rv r" novalidate data-type="{type}">
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" required autocomplete="name"></div>
       <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
       <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
@@ -470,23 +479,36 @@ FORM = '''<form id="bookForm" class="rv r" novalidate data-type="{type}">
       <div class="field"><label for="f-county">County</label><select id="f-county" name="county"></select></div>
       <div class="field full"><label for="f-msg">Tell us more</label><textarea id="f-msg" name="message" placeholder="Venue, group size, ages, anything else…"></textarea></div>
       <div class="field full"><button type="submit" class="btn btn-primary magnetic" style="justify-content:center">Send enquiry <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-      <p class="form-note">Sending opens your email app with your details filled in.</p>
-      <div class="form-ok" id="formOk">Thanks! Your email app should now be open. Just press send and we'll be in touch soon. ✨</div>
+      <p class="form-note">Your enquiry goes straight to our inbox, and we'll reply by email or phone.</p>
+      <div class="form-ok" id="formOk" role="status" aria-live="polite"></div>
     </form>'''
+
+
+def stamp(html):
+    """Add ?v=<hash> to the CSS/JS links so a changed file is always re-downloaded, while unchanged ones stay cached."""
+    for path in ("css/site.css", "js/site.js"):
+        h = hashlib.md5(open(os.path.join(ROOT, path), "rb").read()).hexdigest()[:8]
+        html = re.sub(re.escape(path) + r"(\?v=\w+)?", f"{path}?v={h}", html)
+    return html
 
 
 def main():
     for p in PAGES:
         with open(os.path.join(ROOT, p["file"]), "w") as fh:
-            fh.write(page(p))
+            fh.write(stamp(page(p)))
         print("wrote", p["file"])
     ip = os.path.join(ROOT, "index.html")
     s = open(ip).read()
     s = re.sub(r"<!-- @top -->.*?<!-- /@top -->", lambda m: top("index.html"), s, flags=re.S)
     s = re.sub(r"<!-- @stem -->.*?<!-- /@stem -->", lambda m: stem_section("shows"), s, flags=re.S)
     s = re.sub(r"<!-- @bottom -->.*?<!-- /@bottom -->", lambda m: bottom("index.html"), s, flags=re.S)
-    open(ip, "w").write(s)
+    open(ip, "w").write(stamp(s))
     print("updated index.html header/footer")
+    files = ["index.html"] + [p["file"] for p in PAGES]
+    urls = "".join(f"  <url><loc>{SITE}/{'' if f == 'index.html' else f}</loc><priority>{'1.0' if f == 'index.html' else '0.8'}</priority></url>\n" for f in files)
+    open(os.path.join(ROOT, "sitemap.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n')
+    open(os.path.join(ROOT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
+    print("wrote sitemap.xml, robots.txt")
 
 
 if __name__ == "__main__":
