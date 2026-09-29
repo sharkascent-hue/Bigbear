@@ -44,25 +44,43 @@ section{position:relative;padding:clamp(80px,12vw,150px) 0}
 
 /* ---------- Starfield canvas (fixed, behind everything) ---------- */
 #stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.nebula{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.nebula i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.28;mix-blend-mode:screen;animation:drift 38s ease-in-out infinite alternate}
+.nebula i:nth-child(1){width:60vmax;height:60vmax;left:-20vmax;top:-10vmax;background:radial-gradient(circle,#5b3bff,transparent 65%)}
+.nebula i:nth-child(2){width:55vmax;height:55vmax;right:-22vmax;top:30vh;background:radial-gradient(circle,#e0489b,transparent 65%);animation-duration:46s;animation-delay:-12s;opacity:.18}
+.nebula i:nth-child(3){width:50vmax;height:50vmax;left:20vw;bottom:-30vmax;background:radial-gradient(circle,#2b8cff,transparent 65%);animation-duration:52s;animation-delay:-25s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vw,-4vh) scale(1.15)}100%{transform:translate(-5vw,5vh) scale(.95)}}
 main,footer,header{position:relative;z-index:1}
 
 /* ---------- Intro / start animation ---------- */
-#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 60%,#1a1450 0%,#07061a 65%);transition:clip-path 1.3s var(--ease),opacity .4s 1.1s;clip-path:circle(150% at 50% 100%)}
-#intro.open{clip-path:circle(0% at 50% 100%);pointer-events:none}
+#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#000;overflow:hidden;transition:clip-path 1.2s var(--ease);clip-path:circle(150% at 50% 50%)}
+#intro.open{clip-path:circle(0% at 50% 50%);pointer-events:none}
 #intro.gone{display:none}
-.intro-inner{text-align:center;position:relative}
+#introStars{position:absolute;inset:0;width:100%;height:100%}
+.intro-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(60,50,160,.35),transparent 60%);animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.5}}
+.intro-vid{position:relative;height:min(92vh,92svh);aspect-ratio:576/1024;max-width:100vw;opacity:0;transform:scale(.96);transition:opacity 1s var(--ease),transform 1.2s var(--ease),filter 1s;
+  -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 58%,transparent 100%)}
+.intro-vid video{width:100%;height:100%;object-fit:cover}
+#intro.playing .intro-vid{opacity:1;transform:none}
+#intro.warp .intro-vid{transform:scale(2.2);opacity:0;filter:blur(6px) brightness(1.6);transition:transform 1.2s cubic-bezier(.7,0,.84,0),opacity 1s .2s,filter 1s}
+.intro-flash{position:absolute;inset:0;background:radial-gradient(circle,#fff,rgba(160,190,255,.6) 30%,transparent 70%);opacity:0;pointer-events:none}
+#intro.warp .intro-flash{animation:flash 1.3s ease-out forwards}
+@keyframes flash{0%{opacity:0}60%{opacity:0}75%{opacity:.9}100%{opacity:0}}
+.intro-fallback{position:absolute;inset:0;display:none;place-items:center;text-align:center}
+#intro.fallback .intro-fallback{display:grid}
+#intro.fallback.warp .intro-fallback{transform:scale(2);opacity:0;transition:transform 1.2s cubic-bezier(.7,0,.84,0),opacity 1s .2s}
 .intro-dome{width:min(260px,60vw);aspect-ratio:1/1.1;position:relative;margin:0 auto}
 .intro-dome svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .intro-dome .arch{fill:none;stroke:url(#ig);stroke-width:2.5;stroke-dasharray:900;stroke-dashoffset:900;animation:draw 1.6s var(--ease) .2s forwards}
 .intro-logo{position:absolute;inset:6% 6% 0;opacity:0;transform:scale(.85);animation:logoIn 1s var(--ease) 1.1s forwards;filter:drop-shadow(0 20px 60px rgba(79,143,247,.45))}
 .intro-logo img{width:100%;height:100%;object-fit:contain}
-.intro-orbit{position:absolute;inset:-18%;border-radius:50%;border:1px dashed rgba(255,255,255,.15);animation:spin 14s linear infinite;opacity:0;animation:spin 14s linear infinite,fadeIn .8s .6s forwards}
+.intro-orbit{position:absolute;inset:-18%;border-radius:50%;border:1px dashed rgba(255,255,255,.15);opacity:0;animation:spin 14s linear infinite,fadeIn .8s .6s forwards}
 .intro-orbit::after{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 18px 4px var(--gold)}
 .intro-title{margin-top:28px;font-family:Cinzel,serif;font-size:clamp(1rem,3vw,1.4rem);letter-spacing:.35em;text-transform:uppercase;overflow:hidden}
 .intro-title span{display:inline-block;opacity:0;transform:translateY(110%);animation:rise .7s var(--ease) forwards}
-.intro-tag{margin-top:10px;color:var(--muted);letter-spacing:.3em;font-size:.75rem;text-transform:uppercase;opacity:0;animation:fadeIn .8s 2.3s forwards}
-.intro-bar{width:160px;height:2px;margin:22px auto 0;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
-.intro-bar i{display:block;height:100%;width:0;background:var(--grad);animation:load 2.6s var(--ease) .2s forwards}
+.intro-bar{position:absolute;left:50%;bottom:34px;width:160px;height:2px;transform:translateX(-50%);background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
+.intro-bar i{display:block;height:100%;width:0;background:var(--grad)}
 .skip{position:absolute;bottom:28px;right:28px;font-size:.8rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;opacity:.7}
 .skip:hover{opacity:1;color:#fff}
 @keyframes draw{to{stroke-dashoffset:0}}
@@ -89,7 +107,7 @@ header.hide{transform:translateY(-100%)}
 .mnav.on{visibility:visible;clip-path:circle(150% at calc(100% - 38px) 38px);transition:clip-path .7s var(--ease)}
 .mnav a{opacity:0;transform:translateY(20px);transition:opacity .5s var(--ease),transform .5s var(--ease);color:#e6e8ff}
 .mnav.on a{opacity:1;transform:none}
-.mnav.on a:nth-child(2){transition-delay:.05s}.mnav.on a:nth-child(3){transition-delay:.1s}.mnav.on a:nth-child(4){transition-delay:.15s}.mnav.on a:nth-child(5){transition-delay:.2s}.mnav.on a:nth-child(6){transition-delay:.25s}.mnav.on a:nth-child(7){transition-delay:.3s}
+.mnav.on a:nth-child(2){transition-delay:.05s}.mnav.on a:nth-child(3){transition-delay:.1s}.mnav.on a:nth-child(4){transition-delay:.15s}.mnav.on a:nth-child(5){transition-delay:.2s}.mnav.on a:nth-child(6){transition-delay:.25s}.mnav.on a:nth-child(7){transition-delay:.3s}.mnav.on a:nth-child(8){transition-delay:.35s}
 header.menu-open{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:transparent!important;transform:none!important}
 .burger span{position:absolute;left:10px;right:10px;height:2px;background:#fff;border-radius:2px;transition:.4s var(--ease)}
 .burger span:nth-child(1){top:16px}.burger span:nth-child(2){top:26px}
@@ -239,6 +257,25 @@ header.menu-open{background:transparent!important;backdrop-filter:none!important
 .lb-btn svg{width:22px;height:22px}
 .lb-close{top:20px;right:20px}.lb-prev{left:20px;top:50%;transform:translateY(-50%)}.lb-next{right:20px;top:50%;transform:translateY(-50%)}
 
+/* ---------- Videos ---------- */
+.vids{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
+.vid-card{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:16/9;border:1px solid var(--line);background:#0e0c28;text-align:left;cursor:pointer}
+.vid-card.big{grid-row:span 3;aspect-ratio:auto;min-height:100%}
+.vid-card img,.vid-card video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease),opacity .5s}
+.vid-card video{opacity:0}
+.vid-card.hover video{opacity:1}
+.vid-card:hover img,.vid-card:hover video{transform:scale(1.06)}
+.vid-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(7,6,26,.9))}
+.vid-play{position:absolute;left:50%;top:50%;z-index:2;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.35);transition:transform .4s var(--ease),background .4s}
+.vid-play::before{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(255,255,255,.35);animation:pulse 2.2s infinite}
+.vid-play svg{width:24px;height:24px;margin-left:3px}
+.vid-card:hover .vid-play{transform:scale(1.12);background:rgba(255,255,255,.28)}
+.vid-meta{position:absolute;left:20px;right:20px;bottom:16px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.vid-meta b{font-family:Cinzel,serif;font-size:1.1rem}
+.vid-meta small{color:var(--muted);font-size:.8rem;padding:3px 9px;border-radius:99px;background:rgba(0,0,0,.4)}
+.more-wrap{text-align:center;margin-top:34px}
+.g-item.more{display:none}
+
 /* ---------- FAQ ---------- */
 .faq-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(40px,6vw,90px)}
 .faq{border-top:1px solid var(--line)}
@@ -292,6 +329,8 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 
 /* ---------- Responsive ---------- */
 @media (max-width:960px){
+  .vids{grid-template-columns:1fr 1fr}
+  .vid-card.big{grid-column:1/-1;grid-row:auto;aspect-ratio:16/9}
   .rv.l,.rv.r{transform:translateY(40px)}
   .about,.faq-wrap,.contact{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr)}
@@ -305,6 +344,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
   .mnav{display:flex}
 }
 @media (max-width:560px){
+  .vids{grid-template-columns:1fr}
   form{grid-template-columns:minmax(0,1fr)}
   .steps{grid-template-columns:1fr}
   .stats{gap:12px}
@@ -323,22 +363,28 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 
 <!-- ================= START ANIMATION ================= -->
 <div id="intro" aria-hidden="true">
-  <div class="intro-inner">
-    <div class="intro-dome">
-      <div class="intro-orbit"></div>
-      <svg viewBox="0 0 260 286" preserveAspectRatio="none">
-        <defs><linearGradient id="ig" x1="0" x2="1"><stop offset="0" stop-color="#6fc3ff"/><stop offset=".55" stop-color="#9b6bff"/><stop offset="1" stop-color="#e46fb4"/></linearGradient></defs>
-        <path class="arch" d="M4 282 V130 A126 126 0 0 1 256 130 V282 Z"/>
-      </svg>
-      <div class="intro-logo"><img src="img/logo-sm.png" alt=""></div>
+  <canvas id="introStars"></canvas>
+  <div class="intro-glow"></div>
+  <div class="intro-vid"><video id="logoVid" muted playsinline preload="auto"><source src="video/logo-intro.mp4" type="video/mp4"><source src="video/logo-intro.webm" type="video/webm"></video></div>
+  <div class="intro-fallback">
+    <div>
+      <div class="intro-dome">
+        <div class="intro-orbit"></div>
+        <svg viewBox="0 0 260 286" preserveAspectRatio="none">
+          <defs><linearGradient id="ig" x1="0" x2="1"><stop offset="0" stop-color="#6fc3ff"/><stop offset=".55" stop-color="#9b6bff"/><stop offset="1" stop-color="#e46fb4"/></linearGradient></defs>
+          <path class="arch" d="M4 282 V130 A126 126 0 0 1 256 130 V282 Z"/>
+        </svg>
+        <div class="intro-logo"><img src="img/logo-sm.png" alt=""></div>
+      </div>
+      <div class="intro-title" id="introTitle">Big Bear Planetariums</div>
     </div>
-    <div class="intro-title" id="introTitle">Big Bear Planetariums</div>
-    <div class="intro-tag">Educate and Inspire</div>
-    <div class="intro-bar"><i></i></div>
   </div>
+  <div class="intro-flash"></div>
+  <div class="intro-bar"><i id="introBar"></i></div>
   <button class="skip" id="skip">Skip ›</button>
 </div>
 
+<div class="nebula" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="stars"></canvas>
 <div class="cursor" id="cursor"></div>
 <div class="progress" id="progress"></div>
@@ -354,8 +400,8 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
       <a href="#about">About</a>
       <a href="#who">Who it's for</a>
       <a href="#shows">Shows</a>
+      <a href="#videos">Videos</a>
       <a href="#gallery">Gallery</a>
-      <a href="#faq">FAQ</a>
       <a href="#book" class="btn btn-primary btn-sm">Book a show</a>
     </nav>
     <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
@@ -365,6 +411,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
   <a href="#about">About</a>
   <a href="#who">Who it's for</a>
   <a href="#shows">Shows</a>
+  <a href="#videos">Videos</a>
   <a href="#gallery">Gallery</a>
   <a href="#faq">FAQ</a>
   <a href="tel:0838001933" style="font-family:Outfit,sans-serif;font-size:1.1rem;color:var(--sky)">Call 083 800 1933</a>
@@ -376,7 +423,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 <section class="hero">
   <div class="hero-video" id="heroMedia">
     <video autoplay muted loop playsinline preload="auto" poster="video/hero-poster.jpg">
-      <source src="video/hero.mp4" type="video/mp4">
+      <source src="video/hero.mp4" type="video/mp4"><source src="video/hero.webm" type="video/webm">
     </video>
   </div>
   <div class="wrap">
@@ -403,8 +450,8 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 
 <div class="marquee" aria-hidden="true">
   <div class="marquee-track">
-    <span>Educate and Inspire</span><span>Primary Schools</span><span>Secondary Schools</span><span>Corporate Groups</span><span>Private Parties</span><span>Festivals</span><span>Libraries</span><span>Community Events</span>
-    <span>Educate and Inspire</span><span>Primary Schools</span><span>Secondary Schools</span><span>Corporate Groups</span><span>Private Parties</span><span>Festivals</span><span>Libraries</span><span>Community Events</span>
+    <span>Educate and Inspire</span><span>Primary Schools</span><span>Secondary Schools</span><span>Corporate Groups</span><span>Private Parties</span><span>Festivals</span><span>Libraries</span><span>Community Groups</span><span>Stargazing</span>
+    <span>Educate and Inspire</span><span>Primary Schools</span><span>Secondary Schools</span><span>Corporate Groups</span><span>Private Parties</span><span>Festivals</span><span>Libraries</span><span>Community Groups</span><span>Stargazing</span>
   </div>
 </div>
 
@@ -475,6 +522,12 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
         <h3>Parties &amp; Festivals</h3>
         <p>Birthday parties, summer festivals, fun days and community events. Watch the queues form!</p>
       </article>
+      <article class="card rv tilt" style="transition-delay:.32s">
+        <div class="bg"><img src="img/community-group-sm.webp" alt="" loading="lazy"></div><div class="glare"></div>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.8 6 5.5"/></svg></div>
+        <h3>Community Groups</h3>
+        <p>Libraries, community centres and groups of every age. Nobody is too old to look up in wonder.</p>
+      </article>
     </div>
   </div>
 </section>
@@ -516,12 +569,47 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 
 <!-- ================= BAND ================= -->
 <div class="band">
-  <div class="bgimg" data-speed="0.15"><img src="img/school-group.webp" alt="" loading="lazy"></div>
+  <div class="bgimg" data-speed="0.15"><img src="img/school-group-5.webp" alt="" loading="lazy"></div>
   <div class="wrap">
     <blockquote class="rv s">Educate <span class="grad-text">&amp;</span> Inspire</blockquote>
     <p class="rv">Every visit is about sparking curiosity. That moment when a child looks up and wants to know more.</p>
   </div>
 </div>
+
+<!-- ================= VIDEOS ================= -->
+<section id="videos">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <span class="eyebrow rv">Watch</span>
+        <h2 class="rv">See it <span class="grad-text">in action</span></h2>
+      </div>
+      <p class="lead rv" style="max-width:44ch">From sunny festival fields to the glowing galaxy inside the dome. Tap a video to watch it with sound.</p>
+    </div>
+    <div class="vids">
+      <button class="vid-card rv big" data-src="video/inside-the-dome.mp4" data-poster="video/inside-the-dome.jpg">
+        <img src="video/inside-the-dome.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/inside-the-dome-preview.mp4"></video>
+        <span class="vid-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="vid-meta"><b>Inside the dome</b><small>0:17</small></span>
+      </button>
+      <button class="vid-card rv" style="transition-delay:.08s" data-src="video/festival-day.mp4" data-poster="video/festival-day.jpg">
+        <img src="video/festival-day.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/festival-day-preview.mp4"></video>
+        <span class="vid-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="vid-meta"><b>Festival day</b><small>0:28</small></span>
+      </button>
+      <button class="vid-card rv" style="transition-delay:.16s" data-src="video/festival-park.mp4" data-poster="video/festival-park.jpg">
+        <img src="video/festival-park.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/festival-park-preview.mp4"></video>
+        <span class="vid-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="vid-meta"><b>A day in the park</b><small>0:56</small></span>
+      </button>
+      <button class="vid-card rv" style="transition-delay:.24s" data-src="video/intro-full.mp4" data-poster="video/hero-poster.jpg">
+        <img src="video/hero-poster.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/hero.mp4"></video>
+        <span class="vid-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="vid-meta"><b>Educate and Inspire</b><small>0:15</small></span>
+      </button>
+    </div>
+  </div>
+</section>
 
 <!-- ================= GALLERY ================= -->
 <section id="gallery">
@@ -533,12 +621,14 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
       </div>
       <div class="filters rv" role="tablist">
         <button class="on" data-f="all">All</button>
-        <button data-f="schools">Schools &amp; Halls</button>
+        <button data-f="schools">Schools</button>
         <button data-f="outdoor">Festivals</button>
-        <button data-f="setup">Set-up</button>
+        <button data-f="community">Community</button>
+        <button data-f="setup">Behind the scenes</button>
       </div>
     </div>
     <div class="gallery" id="gallery-grid"></div>
+    <div class="more-wrap"><button class="btn btn-ghost" id="moreBtn">Show all photos</button></div>
   </div>
 </section>
 
@@ -605,7 +695,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 </div>
 
 <div class="lightbox" id="vidbox" role="dialog" aria-modal="true" aria-label="Big Bear Planetariums video">
-  <video id="promo" controls playsinline preload="none" poster="video/intro-poster.jpg" style="width:min(92vw,1100px);border-radius:16px;box-shadow:0 40px 100px rgba(0,0,0,.7)"><source src="video/intro-full.mp4" type="video/mp4"></video>
+  <video id="promo" controls playsinline preload="none" style="width:min(92vw,1100px);max-height:84vh;border-radius:16px;background:#000;box-shadow:0 40px 100px rgba(0,0,0,.7)"></video>
   <button class="lb-btn lb-close" id="vidClose" aria-label="Close video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
 </div>
 
@@ -624,68 +714,139 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 $('#yr').textContent = new Date().getFullYear();
 
-/* ============ Intro / start animation ============ */
+/* ============ Intro: logo video + warp-speed starfield ============ */
 (() => {
-  const t = $('#introTitle'), txt = t.textContent; t.textContent = '';
-  [...txt].forEach((c, i) => {
-    const s = document.createElement('span');
-    s.textContent = c === ' ' ? ' ' : c;
-    s.style.animationDelay = (1.3 + i * .045) + 's';
-    t.appendChild(s);
-  });
-  const intro = $('#intro');
-  let done = false;
-  const finish = () => {
-    if (done) return; done = true;
-    intro.classList.add('open');
-    document.body.classList.remove('loading');
-    setTimeout(() => document.body.classList.add('ready'), 250);
-    setTimeout(() => intro.classList.add('gone'), 1500);
+  const intro = $('#intro'), vid = $('#logoVid'), bar = $('#introBar');
+  const c = $('#introStars'), x = c.getContext('2d');
+  let w, h, dpr, stars = [], speed = 2, target = 2, running = true, done = false, warping = false;
+  const size = () => { dpr = Math.min(devicePixelRatio || 1, 2); w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr; };
+  size(); addEventListener('resize', size);
+  const spawn = s => { s.x = (Math.random() - .5) * w * 2; s.y = (Math.random() - .5) * h * 2; s.z = Math.random() * w; s.pz = s.z; return s; };
+  for (let i = 0; i < 700; i++) stars.push(spawn({}));
+  const loop = () => {
+    if (!running) return;
+    speed += (target - speed) * .04;
+    x.fillStyle = `rgba(0,0,0,${warping ? .25 : .6})`; x.fillRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2;
+    for (const s of stars) {
+      s.pz = s.z; s.z -= speed * dpr;
+      if (s.z < 1) { spawn(s); s.z = s.pz = w; continue; }
+      const sx = s.x / s.z * w * .5 + cx, sy = s.y / s.z * w * .5 + cy;
+      const px = s.x / s.pz * w * .5 + cx, py = s.y / s.pz * w * .5 + cy;
+      const a = Math.min(1, (1 - s.z / w) * 1.6);
+      x.strokeStyle = `rgba(${200 + a * 55},${210 + a * 45},255,${a})`;
+      x.lineWidth = Math.max(.6, (1 - s.z / w) * 2.6) * dpr;
+      x.beginPath(); x.moveTo(px, py); x.lineTo(sx, sy); x.stroke();
+    }
+    requestAnimationFrame(loop);
   };
-  $('#skip').onclick = finish;
+  const reveal = () => {
+    document.body.classList.remove('loading');
+    setTimeout(() => document.body.classList.add('ready'), 200);
+  };
+  const finish = (instant) => {
+    if (done) return; done = true;
+    try { sessionStorage.setItem('bb-intro', '1'); } catch (e) {}
+    if (instant) { intro.classList.add('gone'); running = false; reveal(); return; }
+    warping = true; target = 70; intro.classList.add('warp');
+    setTimeout(() => { intro.classList.add('open'); reveal(); }, 1050);
+    setTimeout(() => { intro.classList.add('gone'); running = false; vid.pause(); }, 2300);
+  };
+  $('#skip').onclick = () => finish();
+
   let seen = false;
-  try { seen = sessionStorage.getItem('bb-intro') === '1'; sessionStorage.setItem('bb-intro', '1'); } catch (e) {}
-  if (reduce || seen) { intro.classList.add('gone'); finish(); }
-  else setTimeout(finish, 3300);
+  try { seen = sessionStorage.getItem('bb-intro') === '1'; } catch (e) {}
+  if (reduce || seen) { finish(true); return; }
+  loop();
+
+  // Fallback animation if the video can't autoplay (e.g. iPhone low-power mode)
+  const fallback = () => {
+    if (intro.classList.contains('playing') || done) return;
+    intro.classList.add('fallback');
+    const t = $('#introTitle'), txt = t.textContent; t.textContent = '';
+    [...txt].forEach((ch, i) => { const s = document.createElement('span'); s.textContent = ch === ' ' ? '\u00a0' : ch; s.style.animationDelay = (1.3 + i * .045) + 's'; t.appendChild(s); });
+    target = 6;
+    bar.style.transition = 'width 3.4s linear'; requestAnimationFrame(() => bar.style.width = '100%');
+    setTimeout(() => finish(), 3600);
+  };
+  vid.addEventListener('playing', () => { intro.classList.add('playing'); target = 4; }, {once: true});
+  vid.addEventListener('timeupdate', () => {
+    if (!vid.duration) return;
+    bar.style.width = (vid.currentTime / vid.duration * 100) + '%';
+    if (vid.currentTime > 5.4 && vid.currentTime < 7.2) target = 14; // match the video's own warp section
+    else if (vid.currentTime >= 7.2) target = 3;
+    if (vid.duration - vid.currentTime < .9) finish();
+  });
+  vid.addEventListener('ended', () => finish());
+  vid.addEventListener('error', fallback);
+  const p = vid.play(); if (p && p.catch) p.catch(fallback);
+  setTimeout(fallback, 2500);
+  setTimeout(() => finish(), 16000); // hard safety net
 })();
 
-/* ============ Starfield + shooting stars ============ */
+/* ============ Starfield, shooting stars, comet cursor ============ */
 (() => {
   const c = $('#stars'), x = c.getContext('2d');
-  let w, h, dpr, stars = [], shoot = [], mx = 0, my = 0, sy = 0;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  let w, h, dpr, stars = [], shoot = [], trail = [], mx = 0, my = 0, px0 = -1, py0 = -1, sy = 0, nextShot = 60;
   const resize = () => {
     dpr = Math.min(devicePixelRatio || 1, 2);
     w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr;
-    const n = Math.min(260, Math.floor(innerWidth * innerHeight / 5000));
-    stars = Array.from({length: n}, () => ({
-      x: Math.random() * w, y: Math.random() * h, z: Math.random() * .8 + .2,
-      r: (Math.random() * 1.2 + .3) * dpr, t: Math.random() * 6.28,
-      hue: Math.random() < .15 ? 45 : Math.random() < .3 ? 260 : 220
-    }));
+    const n = Math.min(420, Math.floor(innerWidth * innerHeight / 3200));
+    stars = Array.from({length: n}, () => {
+      const z = Math.random() ** 2 * .9 + .1;
+      return {x: Math.random() * w, y: Math.random() * h, z, r: (z * 1.5 + .25) * dpr, t: Math.random() * 6.28, sp: .01 + Math.random() * .03,
+        hue: [220, 220, 220, 45, 265, 190][Math.floor(Math.random() * 6)], glint: z > .85 && Math.random() < .5};
+    });
   };
   resize(); addEventListener('resize', resize);
-  addEventListener('mousemove', e => { mx = (e.clientX / innerWidth - .5); my = (e.clientY / innerHeight - .5); });
+  addEventListener('mousemove', e => {
+    mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5;
+    if (fine && !reduce) {
+      const X = e.clientX * dpr, Y = e.clientY * dpr;
+      if (px0 >= 0) { const d = Math.hypot(X - px0, Y - py0); for (let i = 0; i < Math.min(4, d / (6 * dpr)); i++) trail.push({x: X + (Math.random() - .5) * 6 * dpr, y: Y + (Math.random() - .5) * 6 * dpr, vx: (Math.random() - .5) * .6 * dpr, vy: (Math.random() - .5) * .6 * dpr + .3 * dpr, l: 1, hue: 200 + Math.random() * 110}); }
+      px0 = X; py0 = Y;
+    }
+  });
   addEventListener('scroll', () => sy = scrollY, {passive: true});
   let cx = 0, cy = 0;
+  const shootingStar = () => {
+    const dir = Math.random() < .7 ? 1 : -1, a = .25 + Math.random() * .35, sp = (10 + Math.random() * 8) * dpr;
+    shoot.push({x: dir > 0 ? Math.random() * w * .7 : w * (.3 + Math.random() * .7), y: Math.random() * h * .5, l: 0,
+      vx: dir * Math.cos(a) * sp, vy: Math.sin(a) * sp, len: (90 + Math.random() * 120) * dpr});
+  };
   const draw = () => {
     x.clearRect(0, 0, w, h);
     cx += (mx - cx) * .05; cy += (my - cy) * .05;
     for (const s of stars) {
-      s.t += .02 * s.z;
-      const px = ((s.x - cx * 40 * s.z * dpr) % w + w) % w;
-      const py = ((s.y - cy * 40 * s.z * dpr - sy * .15 * s.z * dpr) % h + h) % h;
-      x.globalAlpha = (.45 + Math.sin(s.t) * .35) * s.z + .1;
-      x.fillStyle = `hsl(${s.hue} 90% 88%)`;
-      x.beginPath(); x.arc(px, py, s.r, 0, 6.283); x.fill();
+      s.t += s.sp;
+      const X = ((s.x - cx * 60 * s.z * dpr) % w + w) % w;
+      const Y = ((s.y - cy * 60 * s.z * dpr - sy * .25 * s.z * dpr) % h + h) % h;
+      const a = (.55 + Math.sin(s.t) * .45) * (.35 + s.z * .65);
+      x.globalAlpha = a; x.fillStyle = `hsl(${s.hue} 100% 88%)`;
+      x.beginPath(); x.arc(X, Y, s.r, 0, 6.283); x.fill();
+      if (s.glint && a > .6) {
+        x.globalAlpha = (a - .6) * 1.6; x.strokeStyle = `hsl(${s.hue} 100% 92%)`; x.lineWidth = .7 * dpr;
+        const L = s.r * 5;
+        x.beginPath(); x.moveTo(X - L, Y); x.lineTo(X + L, Y); x.moveTo(X, Y - L); x.lineTo(X, Y + L); x.stroke();
+      }
     }
-    if (Math.random() < .006 && shoot.length < 2) shoot.push({x: Math.random() * w * .8, y: Math.random() * h * .4, l: 0, v: (8 + Math.random() * 6) * dpr});
+    if (--nextShot <= 0) { shootingStar(); nextShot = 90 + Math.random() * 200; }
     shoot = shoot.filter(s => s.l < 1);
     for (const s of shoot) {
-      s.l += .015; s.x += s.v; s.y += s.v * .45;
-      const g = x.createLinearGradient(s.x, s.y, s.x - 120 * dpr, s.y - 54 * dpr);
-      g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-      x.globalAlpha = 1 - s.l; x.strokeStyle = g; x.lineWidth = 1.6 * dpr;
-      x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(s.x - 120 * dpr, s.y - 54 * dpr); x.stroke();
+      s.l += .012; s.x += s.vx; s.y += s.vy;
+      const m = Math.hypot(s.vx, s.vy), tx = s.x - s.vx / m * s.len, ty = s.y - s.vy / m * s.len;
+      const g = x.createLinearGradient(s.x, s.y, tx, ty);
+      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.3, 'rgba(170,200,255,.5)'); g.addColorStop(1, 'rgba(170,200,255,0)');
+      x.globalAlpha = Math.sin(s.l * Math.PI); x.strokeStyle = g; x.lineWidth = 2 * dpr; x.lineCap = 'round';
+      x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(tx, ty); x.stroke();
+      x.fillStyle = '#fff'; x.beginPath(); x.arc(s.x, s.y, 1.6 * dpr, 0, 6.283); x.fill();
+    }
+    trail = trail.filter(p => p.l > 0);
+    for (const p of trail) {
+      p.l -= .025; p.x += p.vx; p.y += p.vy;
+      x.globalAlpha = p.l * .8; x.fillStyle = `hsl(${p.hue} 100% 80%)`;
+      x.beginPath(); x.arc(p.x, p.y, p.l * 2.2 * dpr, 0, 6.283); x.fill();
     }
     x.globalAlpha = 1;
     if (!reduce) requestAnimationFrame(draw);
@@ -696,33 +857,53 @@ $('#yr').textContent = new Date().getFullYear();
 /* ============ Gallery ============ */
 const PHOTOS = [
   ['school-group', 'schools', 'A school group cheering in front of the navy dome'],
+  ['dome-lights-hall', 'setup', 'The dome glowing under a hall full of star lights'],
+  ['festival-flags', 'outdoor', 'The dome at a colourful summer festival'],
+  ['community-group', 'community', 'A community group all smiles after their show'],
   ['dome-black-park', 'outdoor', 'The black dome set up in the sunshine at an outdoor event'],
+  ['secondary-students', 'schools', 'A secondary school year group in front of the dome'],
+  ['telescope', 'setup', 'Looking up through the telescope'],
+  ['school-group-2', 'schools', 'Hands up for the planetarium!'],
+  ['festival-domes', 'outdoor', 'Sky dancers, domes and a festival field'],
+  ['dome-navy-flags', 'schools', 'The navy dome in a school hall full of flags'],
+  ['school-group-4', 'schools', 'Junior classes ready for lift-off'],
+  ['domes-skydancer-hall', 'setup', 'Both domes and a sky dancer, set up indoors'],
   ['dome-navy-hall', 'schools', 'The navy dome inside a school hall'],
   ['festival-queue', 'outdoor', 'Families queueing for a show at a summer festival'],
+  ['school-group-3', 'schools', 'A class celebrating in front of the black dome'],
+  ['display-plush', 'setup', 'Our display table with plush planets and banners'],
   ['dome-black-hall', 'setup', 'Both domes set up side by side in a sports hall'],
+  ['school-group-5', 'schools', 'A whole school hall of happy astronomers'],
   ['dome-navy-school', 'schools', 'The navy dome in a school with our Educate and Inspire banner'],
-  ['display-table', 'setup', 'Our display table with brochures and plush planets'],
   ['festival-sunny', 'outdoor', 'A long queue under the sky dancers at a sunny festival'],
+  ['dome-black-banners', 'setup', 'The black dome framed by our pop-up banners'],
   ['dome-navy-gym', 'schools', 'The navy dome in a school sports hall, ready for the first class'],
+  ['dome-navy-classroom', 'schools', 'The dome set up beside a classroom of space crafts'],
+  ['display-table', 'setup', 'Our display table with brochures and plush planets'],
+  ['dome-navy-hall-2', 'schools', 'The navy dome waiting for the next class'],
   ['dome-banners-hall', 'setup', 'The black dome framed by our pop-up banners'],
-  ['dome-navy-library', 'schools', 'The navy dome visiting a local library']
+  ['dome-navy-library', 'community', 'The navy dome visiting a local library']
 ];
 (() => {
-  const grid = $('#gallery-grid');
+  const grid = $('#gallery-grid'), LIMIT = 12, moreBtn = $('#moreBtn');
+  const expand = () => { $$('.g-item.more').forEach(el => { el.classList.remove('more'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in'))); }); moreBtn.parentElement.style.display = 'none'; };
   grid.innerHTML = PHOTOS.map(([f, cat, alt], i) =>
-    `<figure class="g-item rv" data-cat="${cat}" data-i="${i}" tabindex="0" style="transition-delay:${(i % 3) * .08}s">
+    `<figure class="g-item rv${i >= LIMIT ? ' more' : ''}" data-cat="${cat}" data-i="${i}" tabindex="0" style="transition-delay:${(i % 3) * .08}s">
        <img src="img/${f}-sm.webp" alt="${alt}" loading="lazy">
        <figcaption>${alt}</figcaption>
      </figure>`).join('');
   $$('.filters button').forEach(b => b.onclick = () => {
     $$('.filters button').forEach(x => x.classList.toggle('on', x === b));
     const f = b.dataset.f;
+    if (f !== 'all') expand();
     $$('.g-item').forEach(el => {
       const show = f === 'all' || el.dataset.cat === f;
       if (show) { el.classList.remove('hidden'); el.classList.remove('in'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in'))); }
       else el.classList.add('hidden');
     });
   });
+  moreBtn.onclick = expand;
+  moreBtn.textContent = `Show all ${PHOTOS.length} photos`;
   // Lightbox
   const lb = $('#lightbox'), img = $('#lbImg'), cap = $('#lbCap');
   let cur = 0;
@@ -822,11 +1003,18 @@ if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
   });
 }
 
-/* ============ Promo video modal ============ */
+/* ============ Video modal + hover previews ============ */
 (() => {
   const box = $('#vidbox'), v = $('#promo');
-  const close = () => { box.classList.remove('on'); v.pause(); document.body.style.overflow = ''; };
-  $('#playVid').onclick = () => { box.classList.add('on'); document.body.style.overflow = 'hidden'; v.currentTime = 0; v.play().catch(() => {}); };
+  const open = (src, poster) => { v.poster = poster || ''; v.src = src; box.classList.add('on'); document.body.style.overflow = 'hidden'; v.play().catch(() => {}); };
+  const close = () => { box.classList.remove('on'); v.pause(); v.removeAttribute('src'); v.load(); document.body.style.overflow = ''; };
+  $('#playVid').onclick = () => open('video/intro-full.mp4', 'video/intro-poster.jpg');
+  $$('.vid-card').forEach(c => {
+    c.onclick = () => open(c.dataset.src, c.dataset.poster);
+    const pv = c.querySelector('video');
+    c.addEventListener('mouseenter', () => { if (!pv.src) pv.src = pv.dataset.src; pv.play().then(() => c.classList.add('hover')).catch(() => {}); });
+    c.addEventListener('mouseleave', () => { c.classList.remove('hover'); pv.pause(); });
+  });
   $('#vidClose').onclick = close;
   box.addEventListener('click', e => { if (e.target === box) close(); });
   addEventListener('keydown', e => { if (e.key === 'Escape' && box.classList.contains('on')) close(); });
