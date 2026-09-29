@@ -49,27 +49,29 @@ section{position:relative;padding:clamp(80px,12vw,150px) 0}
 .nebula i:nth-child(1){width:60vmax;height:60vmax;left:-20vmax;top:-10vmax;background:radial-gradient(circle,#5b3bff,transparent 65%)}
 .nebula i:nth-child(2){width:55vmax;height:55vmax;right:-22vmax;top:30vh;background:radial-gradient(circle,#e0489b,transparent 65%);animation-duration:46s;animation-delay:-12s;opacity:.18}
 .nebula i:nth-child(3){width:50vmax;height:50vmax;left:20vw;bottom:-30vmax;background:radial-gradient(circle,#2b8cff,transparent 65%);animation-duration:52s;animation-delay:-25s}
+body.loading .nebula,body.loading #stars{visibility:hidden}
+.nebula i{will-change:transform}
 @keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vw,-4vh) scale(1.15)}100%{transform:translate(-5vw,5vh) scale(.95)}}
 main,footer,header{position:relative;z-index:1}
 
 /* ---------- Intro / start animation ---------- */
-#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#000;overflow:hidden;transition:clip-path 1.2s var(--ease);clip-path:circle(150% at 50% 50%)}
+#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#000;overflow:hidden;transition:clip-path .9s cubic-bezier(.65,0,.35,1);clip-path:circle(150% at 50% 50%);contain:strict}
 #intro.open{clip-path:circle(0% at 50% 50%);pointer-events:none}
 #intro.gone{display:none}
 #introStars{position:absolute;inset:0;width:100%;height:100%}
 .intro-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(60,50,160,.35),transparent 60%);animation:breathe 5s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.5}}
-.intro-vid{position:relative;height:min(92vh,92svh);aspect-ratio:576/1024;max-width:100vw;opacity:0;transform:scale(.96);transition:opacity 1s var(--ease),transform 1.2s var(--ease),filter 1s;
-  -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 58%,transparent 100%)}
+.intro-vid{position:relative;height:min(92vh,92svh);aspect-ratio:576/1024;max-width:100vw;opacity:0;transform:scale(.96) translateZ(0);will-change:transform,opacity;transition:opacity .6s ease-out,transform .8s var(--ease)}
 .intro-vid video{width:100%;height:100%;object-fit:cover}
+.intro-vid::after{content:"";position:absolute;inset:-1px;pointer-events:none;background:radial-gradient(ellipse 50% 50% at 50% 50%,transparent 55%,#000 99%)}
 #intro.playing .intro-vid{opacity:1;transform:none}
-#intro.warp .intro-vid{transform:scale(2.2);opacity:0;filter:blur(6px) brightness(1.6);transition:transform 1.2s cubic-bezier(.7,0,.84,0),opacity 1s .2s,filter 1s}
+#intro.warp .intro-vid{transform:scale(2.4) translateZ(0);opacity:0;transition:transform .8s cubic-bezier(.7,0,.84,0),opacity .6s .15s ease-in}
 .intro-flash{position:absolute;inset:0;background:radial-gradient(circle,#fff,rgba(160,190,255,.6) 30%,transparent 70%);opacity:0;pointer-events:none}
-#intro.warp .intro-flash{animation:flash 1.3s ease-out forwards}
+#intro.warp .intro-flash{animation:flash .9s ease-out forwards}
 @keyframes flash{0%{opacity:0}60%{opacity:0}75%{opacity:.9}100%{opacity:0}}
 .intro-fallback{position:absolute;inset:0;display:none;place-items:center;text-align:center}
 #intro.fallback .intro-fallback{display:grid}
-#intro.fallback.warp .intro-fallback{transform:scale(2);opacity:0;transition:transform 1.2s cubic-bezier(.7,0,.84,0),opacity 1s .2s}
+#intro.fallback.warp .intro-fallback{transform:scale(2);opacity:0;transition:transform .8s cubic-bezier(.7,0,.84,0),opacity .6s .15s}
 .intro-dome{width:min(260px,60vw);aspect-ratio:1/1.1;position:relative;margin:0 auto}
 .intro-dome svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .intro-dome .arch{fill:none;stroke:url(#ig);stroke-width:2.5;stroke-dasharray:900;stroke-dashoffset:900;animation:draw 1.6s var(--ease) .2s forwards}
@@ -365,7 +367,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 <div id="intro" aria-hidden="true">
   <canvas id="introStars"></canvas>
   <div class="intro-glow"></div>
-  <div class="intro-vid"><video id="logoVid" muted playsinline preload="auto"><source src="video/logo-intro.mp4" type="video/mp4"><source src="video/logo-intro.webm" type="video/webm"></video></div>
+  <div class="intro-vid"><video id="logoVid" muted playsinline preload="auto" poster="video/logo-intro.jpg"><source src="video/logo-intro.mp4" type="video/mp4"><source src="video/logo-intro.webm" type="video/webm"></video></div>
   <div class="intro-fallback">
     <div>
       <div class="intro-dome">
@@ -422,7 +424,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 40px;background:linear-gr
 <!-- ================= HERO ================= -->
 <section class="hero">
   <div class="hero-video" id="heroMedia">
-    <video autoplay muted loop playsinline preload="auto" poster="video/hero-poster.jpg">
+    <video id="heroVid" muted loop playsinline preload="metadata" poster="video/hero-poster.jpg">
       <source src="video/hero.mp4" type="video/mp4"><source src="video/hero.webm" type="video/webm">
     </video>
   </div>
@@ -716,72 +718,87 @@ $('#yr').textContent = new Date().getFullYear();
 
 /* ============ Intro: logo video + warp-speed starfield ============ */
 (() => {
-  const intro = $('#intro'), vid = $('#logoVid'), bar = $('#introBar');
-  const c = $('#introStars'), x = c.getContext('2d');
-  let w, h, dpr, stars = [], speed = 2, target = 2, running = true, done = false, warping = false;
-  const size = () => { dpr = Math.min(devicePixelRatio || 1, 2); w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr; };
+  const intro = $('#intro'), vid = $('#logoVid'), bar = $('#introBar'), hero = $('#heroVid');
+  const c = $('#introStars'), x = c.getContext('2d', {alpha: false});
+  let w, h, stars = [], speed = 3, target = 3, running = true, done = false, last = 0;
+  // Render at CSS-pixel resolution: streaks don't need retina detail and it's 4x cheaper on phones
+  const size = () => { w = c.width = innerWidth; h = c.height = innerHeight; };
   size(); addEventListener('resize', size);
-  const spawn = s => { s.x = (Math.random() - .5) * w * 2; s.y = (Math.random() - .5) * h * 2; s.z = Math.random() * w; s.pz = s.z; return s; };
-  for (let i = 0; i < 700; i++) stars.push(spawn({}));
-  const loop = () => {
+  const N = Math.round(Math.min(420, Math.max(160, innerWidth * innerHeight / 3000)));
+  const spawn = (s, far) => { s.x = (Math.random() - .5) * w * 2; s.y = (Math.random() - .5) * h * 2; s.z = far ? w : Math.random() * w; s.pz = s.z; return s; };
+  for (let i = 0; i < N; i++) stars.push(spawn({}));
+  const loop = now => {
     if (!running) return;
-    speed += (target - speed) * .04;
-    x.fillStyle = `rgba(0,0,0,${warping ? .25 : .6})`; x.fillRect(0, 0, w, h);
-    const cx = w / 2, cy = h / 2;
+    const dt = last ? Math.min((now - last) / 16.67, 3) : 1; last = now; // frame-rate independent
+    speed += (target - speed) * Math.min(1, .06 * dt);
+    x.fillStyle = '#000'; x.fillRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2, k = w * .5;
+    // Batch streaks into 4 depth buckets: one stroke() per bucket instead of one per star
+    const B = [[], [], [], []];
     for (const s of stars) {
-      s.pz = s.z; s.z -= speed * dpr;
-      if (s.z < 1) { spawn(s); s.z = s.pz = w; continue; }
-      const sx = s.x / s.z * w * .5 + cx, sy = s.y / s.z * w * .5 + cy;
-      const px = s.x / s.pz * w * .5 + cx, py = s.y / s.pz * w * .5 + cy;
-      const a = Math.min(1, (1 - s.z / w) * 1.6);
-      x.strokeStyle = `rgba(${200 + a * 55},${210 + a * 45},255,${a})`;
-      x.lineWidth = Math.max(.6, (1 - s.z / w) * 2.6) * dpr;
-      x.beginPath(); x.moveTo(px, py); x.lineTo(sx, sy); x.stroke();
+      s.z -= speed * dt;
+      if (s.z < 1) { spawn(s, true); continue; }
+      const sx = s.x / s.z * k + cx, sy = s.y / s.z * k + cy;
+      if (sx < -50 || sx > w + 50 || sy < -50 || sy > h + 50) { spawn(s, true); continue; }
+      const tz = s.z + speed * dt * 1.8;
+      B[Math.min(3, (4 * (1 - s.z / w)) | 0)].push(s.x / tz * k + cx, s.y / tz * k + cy, sx, sy);
     }
+    x.lineCap = 'round';
+    for (let b = 0; b < 4; b++) {
+      const a = B[b]; if (!a.length) continue;
+      x.globalAlpha = [.3, .55, .8, 1][b]; x.lineWidth = [.6, 1.1, 1.7, 2.5][b]; x.strokeStyle = b > 2 ? '#fff' : '#c8d4ff';
+      x.beginPath();
+      for (let n = 0; n < a.length; n += 4) { x.moveTo(a[n], a[n + 1]); x.lineTo(a[n + 2], a[n + 3]); }
+      x.stroke();
+    }
+    x.globalAlpha = 1;
     requestAnimationFrame(loop);
   };
   const reveal = () => {
     document.body.classList.remove('loading');
-    setTimeout(() => document.body.classList.add('ready'), 200);
+    requestAnimationFrame(() => document.body.classList.add('ready'));
+    if (hero) { hero.preload = 'auto'; hero.play().catch(() => {}); }
   };
-  const finish = (instant) => {
+  const finish = instant => {
     if (done) return; done = true;
     try { sessionStorage.setItem('bb-intro', '1'); } catch (e) {}
     if (instant) { intro.classList.add('gone'); running = false; reveal(); return; }
-    warping = true; target = 70; intro.classList.add('warp');
-    setTimeout(() => { intro.classList.add('open'); reveal(); }, 1050);
-    setTimeout(() => { intro.classList.add('gone'); running = false; vid.pause(); }, 2300);
+    target = 90; intro.classList.add('warp');
+    setTimeout(() => { intro.classList.add('open'); reveal(); }, 650);
+    setTimeout(() => { intro.classList.add('gone'); running = false; vid.pause(); }, 1600);
   };
   $('#skip').onclick = () => finish();
 
   let seen = false;
   try { seen = sessionStorage.getItem('bb-intro') === '1'; } catch (e) {}
   if (reduce || seen) { finish(true); return; }
-  loop();
+  requestAnimationFrame(loop);
 
   // Fallback animation if the video can't autoplay (e.g. iPhone low-power mode)
   const fallback = () => {
     if (intro.classList.contains('playing') || done) return;
     intro.classList.add('fallback');
     const t = $('#introTitle'), txt = t.textContent; t.textContent = '';
-    [...txt].forEach((ch, i) => { const s = document.createElement('span'); s.textContent = ch === ' ' ? '\u00a0' : ch; s.style.animationDelay = (1.3 + i * .045) + 's'; t.appendChild(s); });
-    target = 6;
-    bar.style.transition = 'width 3.4s linear'; requestAnimationFrame(() => bar.style.width = '100%');
-    setTimeout(() => finish(), 3600);
+    [...txt].forEach((ch, i) => { const s = document.createElement('span'); s.textContent = ch === ' ' ? '\u00a0' : ch; s.style.animationDelay = (.9 + i * .03) + 's'; t.appendChild(s); });
+    target = 8;
+    bar.style.transition = 'width 2.6s linear'; requestAnimationFrame(() => bar.style.width = '100%');
+    setTimeout(() => finish(), 2800);
   };
-  vid.addEventListener('playing', () => { intro.classList.add('playing'); target = 4; }, {once: true});
-  vid.addEventListener('timeupdate', () => {
-    if (!vid.duration) return;
-    bar.style.width = (vid.currentTime / vid.duration * 100) + '%';
-    if (vid.currentTime > 5.4 && vid.currentTime < 7.2) target = 14; // match the video's own warp section
-    else if (vid.currentTime >= 7.2) target = 3;
-    if (vid.duration - vid.currentTime < .9) finish();
-  });
+  vid.addEventListener('playing', () => { intro.classList.add('playing'); target = 5; }, {once: true});
+  // Progress bar + star speed follow the video (5.7s): the video's own warp runs ~3.5s-4.7s
+  const sync = () => {
+    if (done || !vid.duration) return;
+    const t = vid.currentTime;
+    bar.style.width = (t / vid.duration * 100) + '%';
+    target = t > 3.4 && t < 4.7 ? 22 : t >= 4.7 ? 4 : 5;
+    if (vid.duration - t < .25) return finish();
+    if ('requestVideoFrameCallback' in vid) vid.requestVideoFrameCallback(sync); else requestAnimationFrame(sync);
+  };
+  vid.addEventListener('playing', sync, {once: true});
   vid.addEventListener('ended', () => finish());
-  vid.addEventListener('error', fallback);
   const p = vid.play(); if (p && p.catch) p.catch(fallback);
-  setTimeout(fallback, 2500);
-  setTimeout(() => finish(), 16000); // hard safety net
+  setTimeout(fallback, 1800);
+  setTimeout(() => finish(), 10000); // hard safety net
 })();
 
 /* ============ Starfield, shooting stars, comet cursor ============ */
@@ -816,6 +833,7 @@ $('#yr').textContent = new Date().getFullYear();
       vx: dir * Math.cos(a) * sp, vy: Math.sin(a) * sp, len: (90 + Math.random() * 120) * dpr});
   };
   const draw = () => {
+    if (document.body.classList.contains('loading')) return requestAnimationFrame(draw); // idle behind the intro
     x.clearRect(0, 0, w, h);
     cx += (mx - cx) * .05; cy += (my - cy) * .05;
     for (const s of stars) {
