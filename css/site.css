@@ -109,10 +109,19 @@ header.menu-open{background:transparent!important;backdrop-filter:none!important
 
 /* ---------- Buttons ---------- */
 .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:999px;font-weight:600;font-size:.98rem;position:relative;overflow:hidden;isolation:isolate;transition:transform .35s var(--ease),box-shadow .35s}
-.btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 40px -10px rgba(155,107,255,.7)}
+/* Gold "Book Your Visit Today" rocket button (every booking / enquiry button) */
+.btn-primary{gap:12px;padding:13px 30px 13px 22px;font-weight:800;font-size:1.06rem;letter-spacing:-.015em;line-height:1.1;color:#12163a;
+  background:radial-gradient(130% 85% at 50% -25%,rgba(255,255,255,.7),rgba(255,255,255,0) 58%),linear-gradient(180deg,#ffec7a 0%,#ffd23a 22%,#ffb81c 62%,#f29a00 100%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.75),inset 0 -3px 7px rgba(190,90,0,.5),0 0 0 2px #e89400,0 0 24px rgba(255,190,40,.55),0 12px 26px -10px rgba(0,0,0,.7);
+  text-shadow:0 1px 0 rgba(255,255,255,.65),0 0 7px rgba(255,255,255,.4)}
+.btn-primary::after{content:"";order:-1;flex:none;width:1.75em;height:1.75em;margin:-.15em 0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg transform='rotate(45 16 16)'%3E%3Cpath d='M16 2.5C21 7.5 22.2 14 21.2 21H10.8C9.8 14 11 7.5 16 2.5Z' fill='%2312205a'/%3E%3Ccircle cx='16' cy='11.5' r='2.6' fill='%23ffe38a'/%3E%3Cpath d='M10.8 16.5 5.5 23.5l5.3-1.2ZM21.2 16.5l5.3 7-5.3-1.2Z' fill='%2312205a'/%3E%3Cpath d='M13.6 24v5M16 24v6.5M18.4 24v5' stroke='%2312205a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;transition:transform .45s var(--ease);filter:drop-shadow(0 1px 0 rgba(255,255,255,.5))}
+.btn-primary:hover::after{transform:translate(3px,-3px) scale(1.08)}
+.btn-primary>svg{display:none}
+.btn-primary[disabled]{opacity:.7;cursor:progress}
+.btn-primary.btn-sm{gap:9px;padding:8px 20px 8px 15px;font-size:.88rem}
 .btn-primary::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.45),transparent 70%);transform:translateX(-120%);transition:transform .8s var(--ease);z-index:-1}
 .btn-primary:hover::before{transform:translateX(120%)}
-.btn-primary:hover{box-shadow:0 16px 50px -10px rgba(155,107,255,.9)}
+.btn-primary:hover{filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 2px 0 rgba(255,255,255,.8),inset 0 -3px 7px rgba(190,90,0,.5),0 0 0 2px #f0a000,0 0 34px rgba(255,200,60,.8),0 16px 30px -10px rgba(0,0,0,.7)}
 .btn-ghost{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.04);backdrop-filter:blur(6px)}
 .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.1)}
 .btn svg{width:18px;height:18px;transition:transform .35s var(--ease)}
@@ -473,3 +482,7 @@ html.navigating main{opacity:.55;transition:opacity .35s ease}
 html.navigating .mnav a{pointer-events:none}
 .form-ok.bad{background:rgba(255,122,154,.1);border-color:rgba(255,122,154,.35)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+
+/* STEM and Schools bullets: bold label + text stay together in one line of text */
+.stem li b,.duo li b{font-weight:600;color:#fff}
+.mnav a.btn-primary{color:#12163a}

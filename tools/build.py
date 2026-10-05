@@ -70,7 +70,7 @@ def top(current):
       </div>
       <a href="{home}#videos">Videos</a>
       <a href="{home}#gallery">Gallery</a>
-      <a href="#book" class="btn btn-primary btn-sm">Book a show</a>
+      <a href="#book" class="btn btn-primary btn-sm">Book Your Visit Today</a>
     </nav>
     <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
   </div>
@@ -80,7 +80,7 @@ def top(current):
 {mpages}
   <div class="m-small">{home_link}<a href="{home}#about">About</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#faq">FAQ</a></div>
   <a class="m-call" href="tel:{PHONE_TEL}">Call {PHONE}</a>
-  <a href="#book" class="btn btn-primary">Book a show</a>
+  <a href="#book" class="btn btn-primary">Book Your Visit Today</a>
 </nav>
 <!-- /@top -->'''
 
@@ -130,14 +130,26 @@ def faq_html(items):
 
 
 STEM = [
-    ("S", "Science", "Physics, chemistry, biology &amp; earth science", "#6fc3ff",
-     ["How stars are born, shine and die", "The Sun, Moon, planets and the seasons", "Gravity, light and the colours of the sky", "Life on Earth and the search for life beyond it"]),
-    ("T", "Technology", "The tools that let us explore", "#9b6bff",
-     ["Telescopes, satellites and space probes", "How we photograph galaxies billions of light-years away", "Data, sensors and the technology behind every mission", "The digital planetarium and how it is projected"]),
-    ("E", "Engineering", "Designing things that work in space", "#e46fb4",
-     ["Rockets, launchers and how they reach orbit", "Space stations and the Moon landings", "Rovers and robots exploring Mars", "How astronauts live, work and stay safe"]),
-    ("M", "Maths", "Numbers, patterns and shapes in the sky", "#ffc861",
-     ["Scale: how big is the Universe, really?", "Distances, light-years and travel times", "Orbits, circles, ellipses and geometry", "Patterns, cycles and counting the stars"]),
+    ("S", "Science", "Physics, chemistry, biology &amp; Earth science", "#6fc3ff", [
+        ("Our Solar System", "Explore the Sun, planets, moons and asteroids."),
+        ("Stars and Galaxies", "Discover how stars form and what makes up a galaxy."),
+        ("Gravity and Orbits", "Learn what keeps planets moving around the Sun."),
+        ("Earth and the Night Sky", "Understand day and night, seasons and eclipses.")]),
+    ("T", "Technology", "The tools that let us explore", "#9b6bff", [
+        ("Telescopes", "Discover how powerful instruments reveal distant stars, planets and galaxies."),
+        ("Satellites", "Explore how satellites observe Earth and help us study space."),
+        ("Space Probes and Rovers", "Learn how robotic explorers investigate other planets."),
+        ("Space Imaging", "See how cameras and sensors capture the universe beyond human sight.")]),
+    ("E", "Engineering", "Designing things that work in space", "#e46fb4", [
+        ("Rocket Design", "Discover how engineers build rockets to launch spacecraft into space."),
+        ("Spacecraft and Satellites", "Explore how vehicles are designed to operate in the harsh conditions of space."),
+        ("Planetary Rovers", "Learn how engineers build robots to travel across and investigate other worlds."),
+        ("Space Telescopes", "See how precision engineering creates instruments that study distant stars and galaxies.")]),
+    ("M", "Maths", "Numbers, patterns and shapes in the sky", "#ffc861", [
+        ("Distances in Space", "Explore how we measure the vast distances between planets and stars."),
+        ("Orbits and Patterns", "Discover how maths helps us understand and predict the movements of planets and moons."),
+        ("Size and Scale", "Compare the sizes of Earth, the Sun and other objects in our universe."),
+        ("Time and Cycles", "Investigate how days, years and lunar phases relate to movements in space.")]),
 ]
 
 
@@ -148,7 +160,7 @@ def stem_section(sec_id=None, tight=False):
         f'''      <div class="stem rv" style="--c:{c};transition-delay:{i * .08:.2f}s">
         <span class="letter">{l}</span>
         <h3>{name}</h3><span class="sub">{sub}</span>
-        <ul>{"".join(f"<li>{b}</li>" for b in bullets)}</ul>
+        <ul>{"".join(f"<li><span><b>{lab}:</b> {txt}</span></li>" for lab, txt in bullets)}</ul>
       </div>''' for i, (l, name, sub, c, bullets) in enumerate(STEM))
     return f'''<!-- @stem -->
 <section{idattr} class="stem-wrap" style="{pad}">
@@ -297,8 +309,8 @@ def head(title, desc, file):
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"></noscript>
 {SPEC}
 <link rel="stylesheet" href="css/site.css">
 </head>'''
@@ -315,7 +327,7 @@ def page(p):
         <span class="eyebrow">{sub}</span>
         <h3>{h}</h3>
         <p class="lead">{t}</p>
-        <ul>{"".join(f"<li>{b}</li>" for b in bullets)}</ul>
+        <ul>{"".join(f"<li><span>{b}</span></li>" for b in bullets)}</ul>
       </div>''' for i, h, sub, t, bullets in p["duo"])
         duo = f'''
 <section style="padding-top:0">
@@ -336,7 +348,7 @@ def page(p):
       <span class="eyebrow rv">Only with Big Bear</span>
       <h2 class="rv">Experience it in <span class="grad-text">true 4K</span></h2>
       <p class="lead rv">Crystal-clear stars, planets you could almost touch and a sky that wraps all the way around you. Tap the video to see what your guests are in for.</p>
-      <a href="#book" class="btn btn-primary magnetic rv" style="margin-top:28px">Book your party {ARROW}</a>
+      <a href="#book" class="btn btn-primary magnetic rv" style="margin-top:28px">Book Your Visit Today</a>
     </div>
     <div class="phone-vid rv s" data-play="{src}" data-poster="{poster}" role="button" tabindex="0" aria-label="Play video">
       <img src="{poster}" alt="" loading="lazy"><span class="vid-play">{PLAY}</span>
@@ -369,7 +381,7 @@ def page(p):
     <h1 class="hero-fade d1" style="margin-top:16px">{p["h1"]}</h1>
     <p class="hero-fade d2">{p["lead"]}</p>
     <div class="cta hero-fade d3">
-      <a href="#book" class="btn btn-primary magnetic">Book a show {ARROW}</a>
+      <a href="#book" class="btn btn-primary magnetic">Book Your Visit Today</a>
       <a href="tel:{PHONE_TEL}" class="btn btn-ghost magnetic">Call {PHONE}</a>
     </div>
   </div>
@@ -383,7 +395,7 @@ def page(p):
       <span class="eyebrow rv">Why Big Bear</span>
       <h2 class="rv">{p["intro_h"]}</h2>
       <p class="lead rv">{p["intro_p"]}</p>
-      <a href="#book" class="btn btn-primary magnetic rv" style="margin-top:28px">Check availability {ARROW}</a>
+      <a href="#book" class="btn btn-primary magnetic rv" style="margin-top:28px">Book Your Visit Today</a>
     </div>
     <div class="split-img rv r"><img src="img/{p["intro_img"]}.webp" alt="{p["intro_alt"]}" loading="lazy"></div>
   </div>
@@ -479,7 +491,7 @@ FORM = '''<form id="bookForm" class="rv r" novalidate data-type="{type}">
       <div class="field"><label for="f-date">Preferred date</label><input id="f-date" name="date" type="date"></div>
       <div class="field"><label for="f-county">County</label><select id="f-county" name="county"></select></div>
       <div class="field full"><label for="f-msg">Tell us more</label><textarea id="f-msg" name="message" placeholder="Venue, group size, ages, anything else…"></textarea></div>
-      <div class="field full"><button type="submit" class="btn btn-primary magnetic" style="justify-content:center">Send enquiry <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="field full"><button type="submit" class="btn btn-primary magnetic" style="justify-content:center">Send Enquiry</button></div>
       <p class="form-note">Your enquiry goes straight to our inbox, and we'll reply by email or phone.</p>
       <div class="form-ok" id="formOk" role="status" aria-live="polite"></div>
     </form>'''
