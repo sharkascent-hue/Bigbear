@@ -95,6 +95,7 @@ def bottom(current):
       <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.webp" alt="" width="88" height="85"><span>Big Bear<small>PLANETARIUMS</small></span></a>
       <nav>{pages}<a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></nav>
     </div>
+    <p class="foot-slogan"><b>Your school hall, our planetarium.</b> A whole universe of discovery.</p>
     <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
   </div>
 </footer>

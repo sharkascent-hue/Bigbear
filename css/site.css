@@ -486,3 +486,25 @@ html.navigating .mnav a{pointer-events:none}
 /* STEM and Schools bullets: bold label + text stay together in one line of text */
 .stem li b,.duo li b{font-weight:600;color:#fff}
 .mnav a.btn-primary{color:#12163a}
+
+/* ---------- Slogan ---------- */
+.hero p.slogan{margin:-8px 0 34px;max-width:none;display:flex;flex-direction:column;gap:10px;position:relative;padding-left:22px;color:inherit;font-size:1rem}
+.slogan::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:3px;background:linear-gradient(180deg,#ffe38a,#ffb81c 55%,rgba(255,184,28,0));box-shadow:0 0 14px rgba(255,190,40,.7)}
+.slogan .sl-main{font-family:Cinzel,serif;font-weight:700;font-size:clamp(1.3rem,4.6vw,2.05rem);line-height:1.15;letter-spacing:.01em;color:#fff3c4;
+  background:linear-gradient(100deg,#ffd76a 0%,#fff6c9 24%,#ffb829 46%,#fff6c9 68%,#ffd76a 100%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 16px rgba(255,190,50,.32));animation:sheen 7s linear infinite}
+.slogan .sl-main em{font-style:normal}
+.slogan .sl-sub{display:flex;align-items:center;gap:12px;font-size:clamp(.68rem,2.5vw,.84rem);font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:#a9d4ff}
+.slogan .sl-sub i{font-style:normal;color:#ffd76a;font-size:1.05em;animation:twinkle 3.2s ease-in-out infinite}
+.slogan .sl-sub i:last-child{animation-delay:1.6s}
+@keyframes sheen{to{background-position:-220% center}}
+@keyframes twinkle{50%{opacity:.35;transform:scale(.8)}}
+html[data-perf=low] .slogan .sl-main{animation:none}
+html.menu-lock .slogan .sl-main,html.jumping .slogan .sl-main{animation-play-state:paused}
+.foot-slogan{margin-top:34px;color:var(--muted);font-size:.95rem}
+.foot-slogan b{font-family:Cinzel,serif;font-weight:700;letter-spacing:.01em;background:linear-gradient(100deg,#ffd76a,#fff3b8 50%,#ffb829);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-right:6px}
+@media (max-width:560px){
+  .slogan .sl-sub{letter-spacing:.2em;gap:9px;font-size:.66rem;flex-wrap:wrap}
+  .slogan .sl-sub i:last-child{display:none}
+}
+@media (max-width:360px){.slogan .sl-sub{letter-spacing:.13em;font-size:.62rem}}
