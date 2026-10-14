@@ -57,7 +57,7 @@ def top(current):
 <header id="header">
   <div class="wrap nav">
     <a href="{brand_href}" class="brand" aria-label="Big Bear Planetariums home">
-      <img src="img/logo-sm.png" alt="Big Bear Planetariums logo" width="44" height="48">
+      <img src="img/logo-sm.webp" alt="Big Bear Planetariums logo" width="50" height="48">
       <span>Big Bear<small>PLANETARIUMS</small></span>
     </a>
     <nav class="links" id="links">
@@ -92,7 +92,7 @@ def bottom(current):
 <footer>
   <div class="wrap">
     <div class="foot">
-      <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.png" alt="" width="56" height="61"><span>Big Bear<small>PLANETARIUMS</small></span></a>
+      <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.webp" alt="" width="88" height="85"><span>Big Bear<small>PLANETARIUMS</small></span></a>
       <nav>{pages}<a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></nav>
     </div>
     <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
@@ -300,6 +300,7 @@ def head(title, desc, file):
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#07061a">
 <link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
