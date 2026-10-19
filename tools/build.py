@@ -16,7 +16,7 @@ import re
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SITE = "https://www.bigbearplanetariums.ie"
-SPEC = '''<script type="speculationrules">{"prerender":[{"where":{"href_matches":["/schools.html","/corporate-groups.html","/private-parties.html","/festivals-events.html"]},"eagerness":"moderate"}]}</script>'''
+SPEC = '''<script type="speculationrules">{"prerender":[{"where":{"href_matches":["/schools.html","/corporate-groups.html","/private-parties.html","/festivals-events.html","/meet-the-astronomer.html"]},"eagerness":"moderate"}]}</script>'''
 PHONE, PHONE_TEL = "083 800 1933", "0838001933"
 EMAIL = "info@bigbearplanetariums.ie"
 FACEBOOK = "https://www.facebook.com/bigbearplanetariums/"
@@ -62,6 +62,7 @@ def top(current):
     </a>
     <nav class="links" id="links">
       <a href="{home}#about">About</a>
+      <a href="meet-the-astronomer.html"{cur("meet-the-astronomer.html")}>Meet the Astronomer</a>
       <div class="dd">
         <button type="button" aria-haspopup="true">Shows for {CHEV}</button>
         <div class="dd-menu">
@@ -78,7 +79,7 @@ def top(current):
 <nav class="mnav" id="mnav" aria-label="Mobile menu">
   <span class="m-label">Shows for</span>
 {mpages}
-  <div class="m-small">{home_link}<a href="{home}#about">About</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#faq">FAQ</a></div>
+  <div class="m-small">{home_link}<a href="{home}#about">About</a><a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#faq">FAQ</a></div>
   <a class="m-call" href="tel:{PHONE_TEL}">Call {PHONE}</a>
   <a href="#book" class="btn btn-primary">Book Your Visit Today</a>
 </nav>
@@ -93,7 +94,7 @@ def bottom(current):
   <div class="wrap">
     <div class="foot">
       <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.webp" alt="" width="88" height="85"><span>Big Bear<small>PLANETARIUMS</small></span></a>
-      <nav>{pages}<a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></nav>
+      <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></nav>
     </div>
     <p class="foot-slogan"><b>Your school hall, our planetarium.</b> A whole universe of discovery.</p>
     <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
@@ -483,6 +484,133 @@ def page(p):
 '''
 
 
+
+# ---------------------------------------------------------------------------
+# Meet the Astronomer
+# ---------------------------------------------------------------------------
+ASTRO_FILE = "meet-the-astronomer.html"
+ASTRO_TITLE = "Meet the Astronomer | Big Bear Planetariums Ireland"
+ASTRO_DESC = "Meet the practising astronomer behind Big Bear Planetariums. Explore J09 Balbriggan Observatory, asteroid observations and over 30 years of astronomy experience."
+
+
+def has_img(name):
+    return os.path.exists(os.path.join(ROOT, "img", name + ".webp"))
+
+
+def astro_fig(name, alt, caption):
+    """A photo slot: appears once img/<name>.webp exists (then re-run build.py)."""
+    if not has_img(name):
+        return ""
+    return f'<figure class="a-fig rv"><img src="img/{name}.webp" alt="{alt}" loading="lazy" decoding="async"><figcaption>{caption}</figcaption></figure>'
+
+
+def astro_page():
+    hero = ('<img src="img/astronomer-hero.webp" alt="Carl O&rsquo;Beirnes standing beside the Big Bear portable planetarium at a school" fetchpriority="high">'
+            if has_img("astronomer-hero")
+            else '<img src="img/dome-navy-hall.webp" alt="The Big Bear portable planetarium set up in a school hall" fetchpriority="high">')
+    j09a = astro_fig("astronomer-j09-dome", "The dome and telescope at J09 Balbriggan Observatory in County Dublin", "J09 Balbriggan Observatory: dome and telescope.")
+    j09b = astro_fig("astronomer-j09-equipment", "Working telescope and astronomical imaging equipment inside J09 Balbriggan Observatory", "Working telescope and astronomical imaging equipment inside the observatory.")
+    moore = astro_fig("astronomer-sir-patrick-moore", "Carl O&rsquo;Beirnes with the late Sir Patrick Moore", "Carl with the late Sir Patrick Moore.")
+    pair = f'<div class="wrap"><div class="a-figs">{j09a}{j09b}</div></div>' if (j09a or j09b) else ""
+    ld = ('{"@context":"https://schema.org","@type":"Person","name":"Carl O\'Beirnes","jobTitle":"Practising astronomer",'
+          '"description":"Practising astronomer with more than 30 years of hands-on experience, operator of J09 Balbriggan Observatory and founder of Big Bear Planetariums.",'
+          f'"worksFor":{{"@type":"Organization","name":"Big Bear Planetariums","url":"{SITE}"}},"url":"{SITE}/{ASTRO_FILE}"}}')
+    rev = " rev" if moore else ""
+    return f"""{head(ASTRO_TITLE, ASTRO_DESC, ASTRO_FILE)}
+<body class="loading">
+<script type="application/ld+json">{ld}</script>
+
+{top(ASTRO_FILE)}
+
+<main id="top">
+<section class="hero page-hero a-hero">
+  <div class="hero-video a-hero-img">{hero}</div>
+  <div class="wrap">
+    <div class="crumbs hero-fade"><a href="index.html">Home</a><span>&rsaquo;</span><span>Meet the Astronomer</span></div>
+    <span class="eyebrow hero-fade">Meet the Astronomer</span>
+    <h1 class="hero-fade d1" style="margin-top:16px">Meet <span class="grad-text">Carl O&rsquo;Beirnes</span></h1>
+    <p class="hero-fade d2">Behind Big Bear Planetariums is Carl O&rsquo;Beirnes, a practising astronomer with more than 30 years of hands-on experience observing, imaging and exploring the night sky. That experience brings a personal dimension to every immersive school visit.</p>
+    <div class="cta hero-fade d3">
+      <a href="#book" class="btn btn-primary magnetic">Enquire About a School Visit</a>
+      <a href="index.html" class="btn btn-ghost magnetic">Explore the planetarium experience</a>
+    </div>
+  </div>
+</section>
+
+<section id="life">
+  <div class="wrap a-text">
+    <span class="eyebrow rv">Astronomy background</span>
+    <h2 class="rv">A lifetime <span class="grad-text">under the stars</span></h2>
+    <p class="lead rv">Astronomy is more than a subject Carl presents &ndash; it is something he practises. Decades spent working with telescopes, specialist astronomical cameras and observatory equipment mean that pupils can ask questions of someone who observes the universe for real.</p>
+  </div>
+</section>
+
+<section id="j09" style="padding-top:0">
+  <div class="wrap a-text">
+    <span class="eyebrow rv">Research</span>
+    <h2 class="rv">J09 Balbriggan <span class="grad-text">Observatory</span></h2>
+    <p class="lead rv">Carl operates J09 Balbriggan Observatory in County Dublin. J09 is an official Minor Planet Center observatory code. His observational work includes near-Earth asteroids and observations associated with the Minor Planet Center in Massachusetts, which gathers and processes measurements of small bodies in the Solar System.</p>
+  </div>
+  {pair}
+</section>
+
+<section id="sky-at-night" style="padding-top:0">
+  <div class="wrap split{rev}">
+    <div class="a-text">
+      <span class="eyebrow rv">The Sky at Night</span>
+      <h2 class="rv">Working alongside <span class="grad-text">Sir Patrick Moore</span></h2>
+      <p class="lead rv">Carl&rsquo;s astronomy journey includes working alongside the late Sir Patrick Moore in connection with the BBC astronomy programme <i>The Sky at Night</i>. Carl remembers their shared interest in observing, the stories Sir Patrick told and the opportunity to see some of his early astronomy notes. Those experiences helped shape Carl&rsquo;s enthusiasm for sharing the night sky with others.</p>
+    </div>
+    {moore}
+  </div>
+</section>
+
+<section id="for-schools" style="padding-top:0">
+  <div class="wrap">
+    <div class="a-text">
+      <span class="eyebrow rv">For schools</span>
+      <h2 class="rv">From the observatory <span class="grad-text">to your school hall</span></h2>
+      <p class="lead rv">Big Bear Planetariums brings this practical astronomy experience into schools through spectacular 4K 360-degree immersive space movies, curriculum-linked STEM presentations and age-appropriate discussion.</p>
+    </div>
+    <div class="feats" style="margin-top:34px">
+      <div class="feat rv"><span class="em">🎯</span><h3>Tailored shows</h3><p>Shows tailored to pupils&rsquo; ages and learning needs.</p></div>
+      <div class="feat rv" style="transition-delay:.08s"><span class="em">♿</span><h3>Wheelchair accessible</h3><p>A fully wheelchair-accessible portable planetarium.</p></div>
+      <div class="feat rv" style="transition-delay:.16s"><span class="em">🎧</span><h3>Sensory-friendly</h3><p>Sensory-friendly shows available on request.</p></div>
+      <div class="feat rv" style="transition-delay:.24s"><span class="em">🏫</span><h3>In your school hall</h3><p>An educational experience brought directly into the school hall.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap a-text">
+    <span class="eyebrow rv">Our aim</span>
+    <h2 class="rv">Inspiring <span class="grad-text">tomorrow&rsquo;s astronomers</span></h2>
+    <p class="lead rv">The aim is to spark curiosity and encourage pupils to ask questions about the real universe. A planetarium visit can be the beginning of a lasting interest in science, technology, engineering, mathematics and astronomy.</p>
+    <p class="a-quote rv">We don&rsquo;t just bring the universe to your school. We bring the astronomer too.</p>
+  </div>
+</section>
+
+<section id="book" style="padding-top:0">
+  <div class="wrap contact">
+    <div class="contact-card rv l">
+      <span class="eyebrow">Bring the universe to your school</span>
+      <h2>Enquire about a <span class="grad-text">school visit</span></h2>
+      <p class="lead">Tell us your school, date and class sizes and we&rsquo;ll be back to you with availability and a quote. You can also email <a href="mailto:{EMAIL}" style="color:var(--sky)">{EMAIL}</a> or call <a href="tel:{PHONE_TEL}" style="color:var(--sky)">{PHONE}</a>.</p>
+      <div class="contact-info" id="contactInfo"></div>
+    </div>
+    {FORM.format(type="Primary school")}
+  </div>
+</section>
+</main>
+
+{bottom(ASTRO_FILE)}
+
+<script src="js/site.js"></script>
+</body>
+</html>
+"""
+
+
 FORM = '''<form id="bookForm" class="rv r" novalidate data-type="{type}">
       <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" required autocomplete="name"></div>
@@ -512,6 +640,9 @@ def main():
         with open(os.path.join(ROOT, p["file"]), "w") as fh:
             fh.write(stamp(page(p)))
         print("wrote", p["file"])
+    with open(os.path.join(ROOT, ASTRO_FILE), "w") as fh:
+        fh.write(stamp(astro_page()))
+    print("wrote", ASTRO_FILE)
     ip = os.path.join(ROOT, "index.html")
     s = open(ip).read()
     s = re.sub(r"<!-- @top -->.*?<!-- /@top -->", lambda m: top("index.html"), s, flags=re.S)
@@ -519,7 +650,7 @@ def main():
     s = re.sub(r"<!-- @bottom -->.*?<!-- /@bottom -->", lambda m: bottom("index.html"), s, flags=re.S)
     open(ip, "w").write(stamp(s))
     print("updated index.html header/footer")
-    files = ["index.html"] + [p["file"] for p in PAGES]
+    files = ["index.html"] + [p["file"] for p in PAGES] + [ASTRO_FILE]
     urls = "".join(f"  <url><loc>{SITE}/{'' if f == 'index.html' else f}</loc><priority>{'1.0' if f == 'index.html' else '0.8'}</priority></url>\n" for f in files)
     open(os.path.join(ROOT, "sitemap.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n')
     open(os.path.join(ROOT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
