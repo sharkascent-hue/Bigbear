@@ -510,8 +510,9 @@ def astro_page():
             else '<img src="img/dome-navy-hall.webp" alt="The Big Bear portable planetarium set up in a school hall" fetchpriority="high">')
     j09a = astro_fig("astronomer-j09-dome", "The dome and telescope at J09 Balbriggan Observatory in County Dublin", "J09 Balbriggan Observatory: dome and telescope.")
     j09b = astro_fig("astronomer-j09-equipment", "Working telescope and astronomical imaging equipment inside J09 Balbriggan Observatory", "Working telescope and astronomical imaging equipment inside the observatory.")
+    j09c = astro_fig("astronomer-j09-carl", "Carl O&rsquo;Beirnes at the telescope in J09 Balbriggan Observatory", "Carl at the telescope, observing from J09 Balbriggan Observatory.")
     moore = astro_fig("astronomer-sir-patrick-moore", "Carl O&rsquo;Beirnes with the late Sir Patrick Moore", "Carl with the late Sir Patrick Moore.")
-    pair = f'<div class="wrap"><div class="a-figs">{j09a}{j09b}</div></div>' if (j09a or j09b) else ""
+    pair = f'<div class="wrap"><div class="a-figs">{j09a}{j09b}{j09c}</div></div>' if (j09a or j09b or j09c) else ""
     ld = ('{"@context":"https://schema.org","@type":"Person","name":"Carl O\'Beirnes","jobTitle":"Practising astronomer",'
           '"description":"Practising astronomer with more than 30 years of hands-on experience, operator of J09 Balbriggan Observatory and founder of Big Bear Planetariums.",'
           f'"worksFor":{{"@type":"Organization","name":"Big Bear Planetariums","url":"{SITE}"}},"url":"{SITE}/{ASTRO_FILE}"}}')
