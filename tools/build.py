@@ -21,6 +21,7 @@ PHONE, PHONE_TEL = "083 800 1933", "0838001933"
 EMAIL = "info@bigbearplanetariums.ie"
 FACEBOOK = "https://www.facebook.com/bigbearplanetariums/"
 INSTAGRAM = "https://www.instagram.com/bigbearplanetariums/"
+YOUTUBE = "https://www.youtube.com/channel/UCjLXdcuXkpS6m2_Uyr-0o_A"
 
 # Order here is the order in the nav, menu and footer.
 NAV_PAGES = [
@@ -94,7 +95,7 @@ def bottom(current):
   <div class="wrap">
     <div class="foot">
       <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.webp" alt="" width="88" height="85"><span>Big Bear<small>PLANETARIUMS</small></span></a>
-      <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></nav>
+      <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a><a href="{YOUTUBE}" target="_blank" rel="noopener">YouTube</a></nav>
     </div>
     <p class="foot-slogan"><b>Your school hall, our planetarium.</b> A whole universe of discovery.</p>
     <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>

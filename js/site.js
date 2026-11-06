@@ -5,6 +5,7 @@ const CONTACT = {
   website: "www.bigbearplanetariums.ie",
   facebook: "https://www.facebook.com/bigbearplanetariums/",
   instagram: "https://www.instagram.com/bigbearplanetariums/",
+  youtube: "https://www.youtube.com/channel/UCjLXdcuXkpS6m2_Uyr-0o_A",
   // Web3Forms access key. Public by design: it can only send enquiries to the inbox it was created for.
   formKey: "47ff878f-e509-42d6-8d65-c19a8d2cd3b7"
 };
@@ -495,6 +496,7 @@ $$('.faq details').forEach(d => {
     phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/>',
     web: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>',
     ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/>',
+    yt: '<path d="M21.6 7.2a2.5 2.5 0 00-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4A2.5 2.5 0 002.4 7.2C2 8.7 2 12 2 12s0 3.3.4 4.8a2.5 2.5 0 001.8 1.8C5.7 19 12 19 12 19s6.3 0 7.8-.4a2.5 2.5 0 001.8-1.8c.4-1.5.4-4.8.4-4.8s0-3.3-.4-4.8z"/><path d="M10 15V9l5 3z" fill="currentColor" stroke="none"/>',
     fb: '<path d="M15 3h-2.5A4.5 4.5 0 008 7.5V10H5.5v3.5H8V21h3.5v-7.5H14l.6-3.5h-3.1V7.8c0-.7.5-1.3 1.3-1.3H15z"/>',
     pin: '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'
   };
@@ -506,6 +508,7 @@ $$('.faq details').forEach(d => {
     row('web', 'Website', CONTACT.website, 'https://' + CONTACT.website) +
     row('ig', 'Instagram', '@bigbearplanetariums', CONTACT.instagram) +
     row('fb', 'Facebook', 'bigbearplanetariums', CONTACT.facebook) +
+    row('yt', 'YouTube', 'Big Bear Planetariums', CONTACT.youtube) +
     row('pin', 'Where', 'Travelling all over Ireland');
 
   const counties = ['Carlow','Cavan','Clare','Cork','Donegal','Dublin','Galway','Kerry','Kildare','Kilkenny','Laois','Leitrim','Limerick','Longford','Louth','Mayo','Meath','Monaghan','Offaly','Roscommon','Sligo','Tipperary','Waterford','Westmeath','Wexford','Wicklow','Antrim','Armagh','Derry','Down','Fermanagh','Tyrone'];
