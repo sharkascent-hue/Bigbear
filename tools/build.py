@@ -20,6 +20,7 @@ SPEC = '''<script type="speculationrules">{"prerender":[{"where":{"href_matches"
 PHONE, PHONE_TEL = "083 800 1933", "0838001933"
 EMAIL = "info@bigbearplanetariums.ie"
 FACEBOOK = "https://www.facebook.com/bigbearplanetariums/"
+APP = "https://app.bigbearplanetariums.ie"
 INSTAGRAM = "https://www.instagram.com/bigbearplanetariums/"
 YOUTUBE = "https://www.youtube.com/channel/UCjLXdcuXkpS6m2_Uyr-0o_A"
 
@@ -72,6 +73,7 @@ def top(current):
       </div>
       <a href="{home}#videos">Videos</a>
       <a href="{home}#gallery">Gallery</a>
+      <a href="{APP}" target="_blank" rel="noopener">Explore the App</a>
       <a href="#book" class="btn btn-primary btn-sm">Book Your Visit Today</a>
     </nav>
     <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
@@ -80,7 +82,7 @@ def top(current):
 <nav class="mnav" id="mnav" aria-label="Mobile menu">
   <span class="m-label">Shows for</span>
 {mpages}
-  <div class="m-small">{home_link}<a href="{home}#about">About</a><a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#faq">FAQ</a></div>
+  <div class="m-small">{home_link}<a href="{home}#about">About</a><a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#faq">FAQ</a><a href="{APP}" target="_blank" rel="noopener">Explore the App</a></div>
   <a class="m-call" href="tel:{PHONE_TEL}">Call {PHONE}</a>
   <a href="#book" class="btn btn-primary">Book Your Visit Today</a>
 </nav>
@@ -95,7 +97,7 @@ def bottom(current):
   <div class="wrap">
     <div class="foot">
       <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.webp" alt="" width="88" height="85"><span>Big Bear<small>PLANETARIUMS</small></span></a>
-      <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a><a href="{YOUTUBE}" target="_blank" rel="noopener">YouTube</a></nav>
+      <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{APP}" target="_blank" rel="noopener">App</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a><a href="{YOUTUBE}" target="_blank" rel="noopener">YouTube</a></nav>
     </div>
     <p class="foot-slogan"><b>Your school hall, our planetarium.</b> A whole universe of discovery.</p>
     <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
@@ -649,6 +651,9 @@ def main():
     s = open(ip).read()
     s = re.sub(r"<!-- @top -->.*?<!-- /@top -->", lambda m: top("index.html"), s, flags=re.S)
     s = re.sub(r"<!-- @stem -->.*?<!-- /@stem -->", lambda m: stem_section("shows"), s, flags=re.S)
+    shot = ('<div class="app-shot"><img src="img/app-screenshot.webp" alt="Screenshot of the Big Bear Planetariums app" loading="lazy" decoding="async"></div>'
+            if os.path.exists(os.path.join(ROOT, "img", "app-screenshot.webp")) else "")
+    s = re.sub(r"<!-- @appshot -->.*?<!-- /@appshot -->", lambda m: "<!-- @appshot -->" + shot + "<!-- /@appshot -->", s, flags=re.S)
     s = re.sub(r"<!-- @bottom -->.*?<!-- /@bottom -->", lambda m: bottom("index.html"), s, flags=re.S)
     open(ip, "w").write(stamp(s))
     print("updated index.html header/footer")
