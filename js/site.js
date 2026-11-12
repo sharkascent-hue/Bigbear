@@ -119,12 +119,12 @@ if (heroEl) {
     setTimeout(() => finish(), 2800);
   };
   vid.addEventListener('playing', () => { intro.classList.add('playing'); target = 5; }, {once: true});
-  // Progress bar + star speed follow the video (8s): cruise, then speed up for the last second before the warp out
+  // Progress bar + star speed follow the video (~2.7s): cruise, then speed up for the last moment before the warp out
   const sync = () => {
     if (done || !vid.duration) return;
     const t = vid.currentTime;
     bar.style.width = (t / vid.duration * 100) + '%';
-    target = vid.duration - t < 1.2 ? 16 : 5;
+    target = vid.duration - t < .6 ? 16 : 6;
     if (vid.duration - t < .25) return finish();
     if ('requestVideoFrameCallback' in vid) vid.requestVideoFrameCallback(sync); else requestAnimationFrame(sync);
   };
@@ -132,7 +132,7 @@ if (heroEl) {
   vid.addEventListener('ended', () => finish());
   const p = vid.play(); if (p && p.catch) p.catch(fallback);
   setTimeout(fallback, 1800);
-  setTimeout(() => finish(), 12000); // hard safety net
+  setTimeout(() => finish(), 7000); // hard safety net
 })();
 
 /* ============ Starfield, shooting stars, comet cursor ============ */
