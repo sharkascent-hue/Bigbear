@@ -40,6 +40,11 @@ if (heroEl) {
     if (document.readyState === 'complete') go(); else addEventListener('load', go);
     return;
   }
+  // Laptops get the wide logo video, phones (portrait screens) a tighter crop so the logo fills the width.
+  const shape = matchMedia('(max-aspect-ratio: 1/1)').matches ? 'tall' : 'wide';
+  intro.classList.add(shape); vid.poster = `video/intro-${shape}.jpg`;
+  vid.innerHTML = `<source src="video/intro-${shape}.mp4" type="video/mp4"><source src="video/intro-${shape}.webm" type="video/webm">`;
+  vid.load();
   const c = $('#introStars'), x = c.getContext('2d', {alpha: false});
   let w, h, stars = [], speed = 3, target = 3, running = true, done = false, last = 0, frames = 0, acc = 0;
   // Render at CSS-pixel resolution: streaks don't need retina detail and it's 4x cheaper on phones
@@ -114,12 +119,12 @@ if (heroEl) {
     setTimeout(() => finish(), 2800);
   };
   vid.addEventListener('playing', () => { intro.classList.add('playing'); target = 5; }, {once: true});
-  // Progress bar + star speed follow the video (5.7s): the video's own warp runs ~3.5s-4.7s
+  // Progress bar + star speed follow the video (8s): cruise, then speed up for the last second before the warp out
   const sync = () => {
     if (done || !vid.duration) return;
     const t = vid.currentTime;
     bar.style.width = (t / vid.duration * 100) + '%';
-    target = t > 3.4 && t < 4.7 ? 22 : t >= 4.7 ? 4 : 5;
+    target = vid.duration - t < 1.2 ? 16 : 5;
     if (vid.duration - t < .25) return finish();
     if ('requestVideoFrameCallback' in vid) vid.requestVideoFrameCallback(sync); else requestAnimationFrame(sync);
   };
@@ -127,7 +132,7 @@ if (heroEl) {
   vid.addEventListener('ended', () => finish());
   const p = vid.play(); if (p && p.catch) p.catch(fallback);
   setTimeout(fallback, 1800);
-  setTimeout(() => finish(), 10000); // hard safety net
+  setTimeout(() => finish(), 12000); // hard safety net
 })();
 
 /* ============ Starfield, shooting stars, comet cursor ============ */

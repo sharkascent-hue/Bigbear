@@ -43,9 +43,11 @@ main,footer,header{position:relative;z-index:1}
 #introStars{position:absolute;inset:0;width:100%;height:100%}
 .intro-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(60,50,160,.35),transparent 60%);animation:breathe 5s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.5}}
-.intro-vid{position:relative;height:min(92vh,92svh);aspect-ratio:576/1024;max-width:100vw;opacity:0;transform:scale(.96) translateZ(0);will-change:transform,opacity;transition:opacity .6s ease-out,transform .8s var(--ease)}
-.intro-vid video{width:100%;height:100%;object-fit:cover}
-.intro-vid::after{content:"";position:absolute;inset:-1px;pointer-events:none;background:radial-gradient(ellipse 50% 50% at 50% 50%,transparent 55%,#000 99%)}
+.intro-vid{position:relative;width:min(86vw,140vh);aspect-ratio:16/9;opacity:0;transform:scale(.96) translateZ(0);will-change:transform,opacity;transition:opacity .6s ease-out,transform .8s var(--ease)}
+#intro.tall .intro-vid{width:min(96vw,80vh);aspect-ratio:640/576}
+.intro-vid{mix-blend-mode:screen}
+/* Screen blend lets the warp stars show through the video's dark background; the mask feathers its edges away */
+.intro-vid video{display:block;width:100%;height:100%;object-fit:cover;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 72%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 72%,transparent 100%)}
 #intro.playing .intro-vid{opacity:1;transform:none}
 #intro.warp .intro-vid{transform:scale(2.4) translateZ(0);opacity:0;transition:transform .8s cubic-bezier(.7,0,.84,0),opacity .6s .15s ease-in}
 .intro-flash{position:absolute;inset:0;background:radial-gradient(circle,#fff,rgba(160,190,255,.6) 30%,transparent 70%);opacity:0;pointer-events:none}
