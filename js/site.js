@@ -7,7 +7,7 @@ const CONTACT = {
   instagram: "https://www.instagram.com/bigbearplanetariums/",
   youtube: "https://www.youtube.com/channel/UCjLXdcuXkpS6m2_Uyr-0o_A",
   // Web3Forms access key. Public by design: it can only send enquiries to the inbox it was created for.
-  formKey: "47ff878f-e509-42d6-8d65-c19a8d2cd3b7"
+  formKey: "faa1325f-ba8e-4073-a431-6ecd6405117a"
 };
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
