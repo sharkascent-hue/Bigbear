@@ -10,13 +10,14 @@ Run from the repo root:  python3 tools/build.py
   <!-- @bottom --> / <!-- /@bottom --> in index.html.
 """
 import hashlib
+import json
 import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SITE = "https://www.bigbearplanetariums.ie"
-SPEC = '''<script type="speculationrules">{"prerender":[{"where":{"href_matches":["/schools.html","/corporate-groups.html","/private-parties.html","/festivals-events.html","/meet-the-astronomer.html"]},"eagerness":"moderate"}]}</script>'''
+SPEC = '''<script type="speculationrules">{"prerender":[{"where":{"href_matches":["/schools.html","/corporate-groups.html","/private-parties.html","/festivals-events.html","/meet-the-astronomer.html","/faq.html"]},"eagerness":"moderate"}]}</script>'''
 PHONE, PHONE_TEL = "083 800 1933", "0838001933"
 EMAIL = "info@bigbearplanetariums.ie"
 FACEBOOK = "https://www.facebook.com/bigbearplanetariums/"
@@ -73,6 +74,7 @@ def top(current):
       </div>
       <a href="{home}#videos">Videos</a>
       <a href="{home}#gallery">Gallery</a>
+      <a href="faq.html"{cur("faq.html")}>FAQ</a>
       <a href="{APP}" target="_blank" rel="noopener">Explore the App</a>
       <a href="#book" class="btn btn-primary btn-sm">Book Your Visit Today</a>
     </nav>
@@ -82,7 +84,7 @@ def top(current):
 <nav class="mnav" id="mnav" aria-label="Mobile menu">
   <span class="m-label">Shows for</span>
 {mpages}
-  <div class="m-small">{home_link}<a href="{home}#about">About</a><a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#faq">FAQ</a><a href="{APP}" target="_blank" rel="noopener">Explore the App</a></div>
+  <div class="m-small">{home_link}<a href="{home}#about">About</a><a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="faq.html">FAQ</a><a href="{APP}" target="_blank" rel="noopener">Explore the App</a></div>
   <a class="m-call" href="tel:{PHONE_TEL}">Call {PHONE}</a>
   <a href="#book" class="btn btn-primary">Book Your Visit Today</a>
 </nav>
@@ -97,7 +99,7 @@ def bottom(current):
   <div class="wrap">
     <div class="foot">
       <a href="{home or '#top'}" class="brand"><img src="img/logo-sm.webp" alt="" width="88" height="85"><span>Big Bear<small>PLANETARIUMS</small></span></a>
-      <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{APP}" target="_blank" rel="noopener">App</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a><a href="{YOUTUBE}" target="_blank" rel="noopener">YouTube</a></nav>
+      <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="faq.html">FAQ</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{APP}" target="_blank" rel="noopener">App</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a><a href="{YOUTUBE}" target="_blank" rel="noopener">YouTube</a></nav>
     </div>
     <p class="foot-slogan"><b>Your school hall, our planetarium.</b> A whole universe of discovery.</p>
     <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
@@ -216,10 +218,10 @@ PAGES = [
         videos=[("video/rocket.mp4", "video/rocket.jpg", "Rocket adventure", "0:46", "video/rocket-bg.mp4", "big"),
                 ("video/inside-the-dome.mp4", "video/inside-the-dome.jpg", "Inside the planetarium", "0:17", "video/inside-the-dome-preview.mp4", "")],
         gallery="schools", gallery_h='Schools we&rsquo;ve <span class="grad-text">visited</span>',
-        faq=[("How much space do you need?", "A school hall, sports hall or large room with enough floor space and headroom for the planetarium. Tell us about your hall and we'll confirm it's a fit before the day."),
-             ("How many classes can see a show?", "We plan a timetable with you so groups rotate through the planetarium across the day. Let us know how many classes you have and we'll work it out together."),
-             ("What do we need to provide?", "Just the space and access to a standard power socket. We bring the planetarium, the projection equipment and everything else."),
-             ("Can every child take part?", "Talk to us about any access or sensory needs in your group and we'll plan the show around them.")],
+        faq=[("How much space do you need?", "A clear indoor floor area of 9 metres × 9 metres, with at least 4 metres of clear ceiling height. A school hall or sports hall is usually perfect."),
+             ("How many pupils can see a show?", "Up to 60 primary pupils, or about 45–50 secondary students, per show. Schools with up to 300 pupils can usually be accommodated in one day, and we agree a timetable with you so every class gets its turn."),
+             ("What do we need to provide?", "The clear indoor space, access to a power socket and parking. We bring the planetarium and presentation equipment."),
+             ("Can every child take part?", "Yes. The planetarium has a dedicated wheelchair entrance, and sensory-friendly sessions with no flashing images and reduced sound are available on request.")],
     ),
     dict(
         file="corporate-groups.html", type="Corporate group",
@@ -448,6 +450,7 @@ def page(p):
       <span class="eyebrow rv">FAQ</span>
       <h2 class="rv">Good <span class="grad-text">questions</span></h2>
       <p class="lead rv">Anything else? Call us on <a href="tel:{PHONE_TEL}" style="color:var(--sky)">{PHONE}</a>. We're always happy to talk space.</p>
+      <a href="faq.html" class="btn btn-ghost rv" style="margin-top:24px">See all FAQs</a>
     </div>
     <div class="faq rv">
 {faq_html(p["faq"])}
@@ -615,6 +618,110 @@ def astro_page():
 """
 
 
+
+# ---------------------------------------------------------------------------
+# FAQ page (school visits)
+# ---------------------------------------------------------------------------
+FAQ_FILE = "faq.html"
+FAQ_TITLE = "School Visit FAQs | Big Bear Planetariums Ireland"
+FAQ_DESC = "Answers to schools' common questions about a Big Bear Planetariums visit: space needed, class sizes, show length, whole-school days, accessibility, sensory-friendly shows and booking."
+
+# (question, [paragraphs]). Paragraph HTML is allowed; the schema text is the same with tags stripped.
+FAQS = [
+    ("What space does the school need?", [
+        "We need a clear indoor floor area measuring 9 metres × 9 metres, with at least 4 metres of clear ceiling height."]),
+    ("How many pupils can attend each show?", [
+        "Our planetarium can accommodate up to 60 primary school pupils, or approximately 45–50 secondary school students, per show."]),
+    ("How long does each show last?", [
+        "Shows are tailored to your school’s timetable and pupils’ needs, with sessions lasting anywhere from 10 minutes to one hour per class."]),
+    ("Can you cater for a whole school?", [
+        "Yes. Schools with up to 300 pupils can usually be accommodated in one day. For larger schools, we recommend a two-day visit. We agree a timetable with you in advance so every class gets its turn."]),
+    ("How long do setup and packing away take?", [
+        "Please allow 45 minutes for setup before the first show and 45 minutes to pack away after the final show."]),
+    ("What does the school need to provide?", [
+        "Along with the clear indoor space, the school needs to provide access to a power socket and parking. We bring the planetarium and presentation equipment."]),
+    ("Is the planetarium wheelchair accessible?", [
+        "Yes. The planetarium has a dedicated wheelchair entrance at the side, allowing wheelchair users to join their group for the show. Please let us know about any access requirements when enquiring so we can plan your visit."]),
+    ("Are sensory-friendly sessions available?", [
+        "Yes. Our sensory-friendly sessions have no flashing images and reduced sound levels. These shows can last approximately 10–30 minutes, depending on the school’s needs."]),
+    ("Are the shows suitable for different ages?", [
+        "Yes. From Junior and Senior Infants through to Sixth Class, pupils receive different shows with content and explanations tailored to their age, learning level and class needs. We also cater for secondary students, with content adapted to their learning level."]),
+    ("Who presents the shows?", [
+        'Shows are presented personally by <a href="meet-the-astronomer.html">Carl O’Beirnes</a>, a practising astronomer with over 30 years’ hands-on experience. Carl brings his real observing experience into each visit, answering pupils’ questions and making astronomy exciting and accessible.']),
+    ("Do teachers need to stay with their classes?", [
+        "Yes. Teachers must remain with their students at all times inside the planetarium."]),
+    ("Where do you travel, and is a deposit required?", [
+        "We travel to schools throughout the Republic of Ireland and provide a tailored quote based on your location and requirements.",
+        "No booking deposit is currently required. Any change to this policy will be explained before you book.",
+        f'To enquire, email <a href="mailto:{EMAIL}">{EMAIL}</a> or use the website’s <a href="#book">booking enquiry form</a>.']),
+    ("What if our school needs to change its booking date?", [
+        "If your school needs to cancel the original date, we’re happy to arrange an alternative date that suits you, subject to availability. Please contact us so we can reorganise your visit."]),
+    ("Can teachers and pupils use the Big Bear app before and after our visit?", [
+        "Yes. The Big Bear Planetariums app helps bring learning into the classroom before and after your visit.",
+        "Beforehand, teachers and pupils can explore astronomy topics and prepare questions to ask Carl inside the planetarium.",
+        "Afterwards, keep the excitement going with astronomy quizzes, Solar System exploration and downloadable art and colouring resources. Teachers can use these activities to revisit what pupils discovered and encourage further questions about space.",
+        f'<a href="{APP}" target="_blank" rel="noopener">Explore the Big Bear Planetariums app</a>']),
+]
+
+
+def faq_page():
+    items = "\n".join(
+        f'      <details><summary>{i}. {q}<i></i></summary><div class="ans">{"".join(f"<p>{p}</p>" for p in ps)}</div></details>'
+        for i, (q, ps) in enumerate(FAQS, 1))
+    strip = lambda t: re.sub(r"<[^>]+>", "", t)
+    ld = json.dumps({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": " ".join(strip(p) for p in ps)}} for q, ps in FAQS]},
+        ensure_ascii=False)
+    return f"""{head(FAQ_TITLE, FAQ_DESC, FAQ_FILE)}
+<body class="loading">
+<script type="application/ld+json">{ld}</script>
+
+{top(FAQ_FILE)}
+
+<main id="top">
+<section class="hero page-hero a-hero faq-hero">
+  <div class="hero-video a-hero-img"><img src="img/dome-navy-gym.webp" alt="" fetchpriority="high"></div>
+  <div class="wrap">
+    <div class="crumbs hero-fade"><a href="index.html">Home</a><span>&rsaquo;</span><span>FAQ</span></div>
+    <span class="eyebrow hero-fade">School visits</span>
+    <h1 class="hero-fade d1" style="margin-top:16px">Frequently asked <span class="grad-text">questions</span></h1>
+    <p class="hero-fade d2">Everything schools usually ask before booking a Big Bear Planetariums visit. Can&rsquo;t see your question? Call us on <a href="tel:{PHONE_TEL}" style="color:var(--sky)">{PHONE}</a> or email <a href="mailto:{EMAIL}" style="color:var(--sky)">{EMAIL}</a>.</p>
+    <div class="cta hero-fade d3">
+      <a href="#book" class="btn btn-primary magnetic">Book Your Visit Today</a>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap faq-page">
+    <div class="faq rv">
+{items}
+    </div>
+    <p class="faq-slogan rv"><b>Your school hall, our planetarium.</b><span>A whole universe of discovery.</span></p>
+  </div>
+</section>
+
+<section id="book" style="padding-top:0">
+  <div class="wrap contact">
+    <div class="contact-card rv l">
+      <span class="eyebrow">Book a show</span>
+      <h2>Enquire about a <span class="grad-text">school visit</span></h2>
+      <p class="lead">Tell us your school, date and class sizes and we&rsquo;ll be back to you with availability and a quote.</p>
+      <div class="contact-info" id="contactInfo"></div>
+    </div>
+    {FORM.format(type="Primary school")}
+  </div>
+</section>
+</main>
+
+{bottom(FAQ_FILE)}
+
+<script src="js/site.js"></script>
+</body>
+</html>
+"""
+
+
 FORM = '''<form id="bookForm" class="rv r" novalidate data-type="{type}">
       <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" required autocomplete="name"></div>
@@ -647,6 +754,9 @@ def main():
     with open(os.path.join(ROOT, ASTRO_FILE), "w") as fh:
         fh.write(stamp(astro_page()))
     print("wrote", ASTRO_FILE)
+    with open(os.path.join(ROOT, FAQ_FILE), "w") as fh:
+        fh.write(stamp(faq_page()))
+    print("wrote", FAQ_FILE)
     ip = os.path.join(ROOT, "index.html")
     s = open(ip).read()
     s = re.sub(r"<!-- @top -->.*?<!-- /@top -->", lambda m: top("index.html"), s, flags=re.S)
@@ -657,7 +767,7 @@ def main():
     s = re.sub(r"<!-- @bottom -->.*?<!-- /@bottom -->", lambda m: bottom("index.html"), s, flags=re.S)
     open(ip, "w").write(stamp(s))
     print("updated index.html header/footer")
-    files = ["index.html"] + [p["file"] for p in PAGES] + [ASTRO_FILE]
+    files = ["index.html"] + [p["file"] for p in PAGES] + [ASTRO_FILE, FAQ_FILE]
     urls = "".join(f"  <url><loc>{SITE}/{'' if f == 'index.html' else f}</loc><priority>{'1.0' if f == 'index.html' else '0.8'}</priority></url>\n" for f in files)
     open(os.path.join(ROOT, "sitemap.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n')
     open(os.path.join(ROOT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
