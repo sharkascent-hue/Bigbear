@@ -102,7 +102,7 @@ def bottom(current):
       <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="faq.html">FAQ</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{APP}" target="_blank" rel="noopener">App</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a><a href="{YOUTUBE}" target="_blank" rel="noopener">YouTube</a></nav>
     </div>
     <p class="foot-slogan"><b>Your school hall, our planetarium.</b> A whole universe of discovery.</p>
-    <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
+    <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦ · <a href="https://almlabmarketing.com" target="_blank" rel="noopener">Website by AlmLab</a></span></div>
   </div>
 </footer>
 
