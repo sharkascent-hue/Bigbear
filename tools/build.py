@@ -102,8 +102,9 @@ def bottom(current):
       <nav>{pages}<a href="meet-the-astronomer.html">Astronomer</a><a href="faq.html">FAQ</a><a href="{home}#videos">Videos</a><a href="{home}#gallery">Gallery</a><a href="#book">Book</a><a href="tel:{PHONE_TEL}">{PHONE}</a><a href="mailto:{EMAIL}">Email</a><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a><a href="{APP}" target="_blank" rel="noopener">App</a><a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a><a href="{YOUTUBE}" target="_blank" rel="noopener">YouTube</a></nav>
     </div>
     <p class="foot-slogan"><b>Your school hall, our planetarium.</b> A whole universe of discovery.</p>
-    <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦ · <a href="https://almlabmarketing.com" target="_blank" rel="noopener">Website by AlmLab</a></span></div>
+    <div class="copy"><span>© <span id="yr"></span> Big Bear Planetariums · Ireland</span><span>Educate and Inspire ✦</span></div>
   </div>
+<div class="almlab-credit-row" style="display:flex;justify-content:flex-end;padding:16px 24px 88px"><a class="almlab-credit" href="https://almlabmarketing.com" target="_blank" rel="noopener" style="color:#5dff7f;font-weight:600;font-size:13px;letter-spacing:.03em;text-decoration:none;white-space:nowrap;text-shadow:0 0 4px rgba(93,255,127,.95),0 0 10px rgba(57,255,106,.6),0 0 22px rgba(57,255,106,.35)">Website by AlmLab</a></div>
 </footer>
 
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
